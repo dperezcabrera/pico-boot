@@ -8,13 +8,16 @@ from typing import Any, Iterable, List, TYPE_CHECKING, Union
 KeyT = Union[str, type]
 
 if TYPE_CHECKING:
+    from typing import Dict, Optional, Tuple
     from pico_ioc import PicoContainer, ContextConfig
     from pico_ioc import init as init, ContainerObserver
 else:
-    from typing import Dict, Optional, Tuple, Union
+    from typing import Dict, Optional, Tuple
     import logging
     from pico_ioc import PicoContainer, ContextConfig
     from pico_ioc import init as _ioc_init, ContainerObserver
+
+    logger = logging.getLogger(__name__)
 
     def _to_module_list(modules: Union[Any, Iterable[Any]]) -> List[Any]:
         if isinstance(modules, Iterable) and not isinstance(modules, (str, bytes)):
@@ -26,7 +29,10 @@ else:
             return obj
         if isinstance(obj, str):
             return import_module(obj)
-        return import_module(obj.__name__)
+        module_name = getattr(obj, "__module__", None) or getattr(obj, "__name__", None)
+        if not module_name:
+            raise ImportError(f"Cannot determine module for object {obj!r}")
+        return import_module(module_name)
 
     def _normalize_modules(raw: Iterable[Any]) -> List[ModuleType]:
         seen: set[str] = set()
@@ -43,7 +49,7 @@ else:
         eps = entry_points()
         if hasattr(eps, "select"):
             selected = eps.select(group=group)
-        else:
+        else:  # legacy API
             selected = [ep for ep in eps if ep.group == group]
 
         seen: set[str] = set()
@@ -51,12 +57,18 @@ else:
 
         for ep in selected:
             try:
-                # opcional: saltar cosas del core
                 if ep.module in ("pico_ioc", "pico_stack"):
                     continue
                 m = import_module(ep.module)
-            except Exception:
+            except Exception as exc:
+                logger.warning(
+                    "Failed to load pico-stack plugin entry point '%s' (%s): %s",
+                    ep.name,
+                    ep.module,
+                    exc,
+                )
                 continue
+
             name = m.__name__
             if name not in seen:
                 seen.add(name)
@@ -64,36 +76,10 @@ else:
 
         return modules
 
-
     _IOC_INIT_SIG = inspect.signature(_ioc_init)
 
-    def init(
-        modules: Union[Any, Iterable[Any]],
-        *,
-        profiles: Tuple[str, ...] = (),
-        allowed_profiles: Optional[Iterable[str]] = None,
-        environ: Optional[Dict[str, str]] = None,
-        overrides: Optional[Dict[KeyT, Any]] = None,
-        logger: Optional[logging.Logger] = None,
-        config: Optional[ContextConfig] = None,
-        custom_scopes: Optional[Iterable[str]] = None,
-        validate_only: bool = False,
-        container_id: Optional[str] = None,
-        observers: Optional[List["ContainerObserver"]] = None,
-    ) -> PicoContainer:
-        bound = _IOC_INIT_SIG.bind(
-            modules,
-            profiles=profiles,
-            allowed_profiles=allowed_profiles,
-            environ=environ,
-            overrides=overrides,
-            logger=logger,
-            config=config,
-            custom_scopes=custom_scopes,
-            validate_only=validate_only,
-            container_id=container_id,
-            observers=observers,
-        )
+    def init(*args: Any, **kwargs: Any) -> PicoContainer:
+        bound = _IOC_INIT_SIG.bind(*args, **kwargs)
         bound.apply_defaults()
 
         base_modules = _normalize_modules(_to_module_list(bound.arguments["modules"]))
@@ -112,3 +98,11 @@ else:
         return _ioc_init(*bound.args, **bound.kwargs)
 
     init.__signature__ = _IOC_INIT_SIG
+
+__all__ = [
+    "init",
+    "PicoContainer",
+    "ContextConfig",
+    "ContainerObserver",
+]
+

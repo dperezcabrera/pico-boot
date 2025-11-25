@@ -1,0 +1,18 @@
+include README.md
+include LICENSE
+
+recursive-include src *.py
+
+recursive-include tests *.py
+
+exclude .gitignore
+exclude Dockerfile*
+exclude docker-compose*.yml
+exclude Makefile
+
+prune build
+prune dist
+prune .tox
+prune .pytest_cache
+prune __pycache__
+
