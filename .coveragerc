@@ -1,0 +1,17 @@
+[run]
+branch = True
+source =
+    pico_stack
+omit =
+    */_version.py
+
+[paths]
+pico_stack =
+    src/pico_stack
+    .tox/*/lib/*/site-packages/pico_stack
+    .tox/*/site-packages/pico_stack
+    */site-packages/pico_stack
+
+[report]
+show_missing = True
+

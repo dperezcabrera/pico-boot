@@ -1,0 +1,31 @@
+FROM python:3.13-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+RUN pip install --no-cache-dir build
+
+COPY pico-ioc ./pico-ioc
+COPY pico-stack ./pico-stack
+COPY pico-fastapi ./pico-fastapi
+COPY pico-pydantic ./pico-pydantic
+COPY pico-sqlalchemy ./pico-sqlalchemy
+# COPY pico-celery ./pico-celery  <-- Descomenta si quieres probar este también
+
+
+RUN mkdir /dist
+RUN python -m build ./pico-ioc --wheel --outdir /dist
+RUN python -m build ./pico-stack --wheel --outdir /dist
+RUN python -m build ./pico-fastapi --wheel --outdir /dist
+RUN python -m build ./pico-pydantic --wheel --outdir /dist
+RUN python -m build ./pico-sqlalchemy --wheel --outdir /dist
+
+RUN pip install /dist/*.whl
+
+RUN pip install fastapi uvicorn pydantic pytest
+
+COPY test_stack_integration.py .
+
+CMD ["python", "test_stack_integration.py"]

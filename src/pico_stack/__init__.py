@@ -3,20 +3,18 @@ import os
 from importlib import import_module
 from importlib.metadata import entry_points
 from types import ModuleType
-from typing import Any, Iterable, List, TYPE_CHECKING
+from typing import Any, Iterable, List, TYPE_CHECKING, Union
+
+KeyT = Union[str, type]
 
 if TYPE_CHECKING:
     from pico_ioc import PicoContainer, ContextConfig
-    from pico_ioc import init as init
-    from pico_ioc.observers import ContainerObserver
-    from pico_ioc.typing import KeyT
+    from pico_ioc import init as init, ContainerObserver
 else:
     from typing import Dict, Optional, Tuple, Union
     import logging
     from pico_ioc import PicoContainer, ContextConfig
-    from pico_ioc import init as _ioc_init
-    from pico_ioc.observers import ContainerObserver
-    from pico_ioc.typing import KeyT
+    from pico_ioc import init as _ioc_init, ContainerObserver
 
     def _to_module_list(modules: Union[Any, Iterable[Any]]) -> List[Any]:
         if isinstance(modules, Iterable) and not isinstance(modules, (str, bytes)):
@@ -41,30 +39,30 @@ else:
                 result.append(m)
         return result
 
-        def _load_plugin_modules(group: str = "pico_stack.modules") -> List[ModuleType]:
-            eps = entry_points()
-            if hasattr(eps, "select"):
-                selected = eps.select(group=group)
-            else:
-                selected = [ep for ep in eps if ep.group == group]
+    def _load_plugin_modules(group: str = "pico_stack.modules") -> List[ModuleType]:
+        eps = entry_points()
+        if hasattr(eps, "select"):
+            selected = eps.select(group=group)
+        else:
+            selected = [ep for ep in eps if ep.group == group]
 
-            seen: set[str] = set()
-            modules: List[ModuleType] = []
+        seen: set[str] = set()
+        modules: List[ModuleType] = []
 
-            for ep in selected:
-                try:
-                    # opcional: saltar cosas del core
-                    if ep.module in ("pico_ioc", "pico_stack"):
-                        continue
-                    m = import_module(ep.module)
-                except Exception:
+        for ep in selected:
+            try:
+                # opcional: saltar cosas del core
+                if ep.module in ("pico_ioc", "pico_stack"):
                     continue
-                name = m.__name__
-                if name not in seen:
-                    seen.add(name)
-                    modules.append(m)
+                m = import_module(ep.module)
+            except Exception:
+                continue
+            name = m.__name__
+            if name not in seen:
+                seen.add(name)
+                modules.append(m)
 
-            return modules
+        return modules
 
 
     _IOC_INIT_SIG = inspect.signature(_ioc_init)
