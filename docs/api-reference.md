@@ -1,6 +1,6 @@
 # API Reference
 
-Complete API documentation for Pico-Stack.
+Complete API documentation for Pico-Boot.
 
 ## Functions
 
@@ -9,7 +9,7 @@ Complete API documentation for Pico-Stack.
 Main entry point. Drop-in replacement for `pico_ioc.init()` with auto-discovery.
 
 ```python
-from pico_stack import init
+from pico_boot import init
 
 container = init(
     modules=["myapp"],           # Required: modules to scan
@@ -39,7 +39,7 @@ container = init(
 #### Behavior
 
 1. Normalizes and deduplicates provided modules
-2. Discovers plugins from `pico_stack.modules` entry points (if enabled)
+2. Discovers plugins from `pico_boot.modules` entry points (if enabled)
 3. Harvests `PICO_SCANNERS` from all loaded modules
 4. If `config` is `None`, builds default configuration:
    - Searches for `application.yaml/yml/json` or `settings.yaml/yml/json`
@@ -49,7 +49,7 @@ container = init(
 #### Example
 
 ```python
-from pico_stack import init
+from pico_boot import init
 
 # Basic usage
 container = init(modules=["myapp.services", "myapp.repos"])
@@ -75,7 +75,7 @@ container = init(
 
 ## Environment Variables
 
-### `PICO_STACK_AUTO_PLUGINS`
+### `PICO_BOOT_AUTO_PLUGINS`
 
 Controls automatic plugin discovery.
 
@@ -86,15 +86,15 @@ Controls automatic plugin discovery.
 
 ```bash
 # Disable auto-discovery
-export PICO_STACK_AUTO_PLUGINS=false
+export PICO_BOOT_AUTO_PLUGINS=false
 ```
 
-### `PICO_STACK_CONFIG_FILE`
+### `PICO_BOOT_CONFIG_FILE`
 
 Specify a custom configuration file path.
 
 ```bash
-export PICO_STACK_CONFIG_FILE=/etc/myapp/config.yaml
+export PICO_BOOT_CONFIG_FILE=/etc/myapp/config.yaml
 ```
 
 Takes precedence over default file discovery.
@@ -103,7 +103,7 @@ Takes precedence over default file discovery.
 
 ## Re-exported from pico-ioc
 
-Pico-Stack re-exports these commonly used symbols for convenience:
+Pico-Boot re-exports these commonly used symbols for convenience:
 
 | Symbol | Description |
 |--------|-------------|
@@ -139,19 +139,19 @@ class MyScanner(CustomScanner):
 PICO_SCANNERS = [MyScanner()]
 ```
 
-Pico-Stack collects these from all loaded modules.
+Pico-Boot collects these from all loaded modules.
 
 ---
 
 ## Entry Points
 
-### `pico_stack.modules`
+### `pico_boot.modules`
 
 The entry point group used for plugin discovery.
 
 ```toml
 # pyproject.toml
-[project.entry-points."pico_stack.modules"]
+[project.entry-points."pico_boot.modules"]
 my_plugin = "my_plugin"
 ```
 
@@ -178,7 +178,7 @@ These are implementation details and may change:
 
 When `config=None`:
 
-1. `$PICO_STACK_CONFIG_FILE` (if set)
+1. `$PICO_BOOT_CONFIG_FILE` (if set)
 2. `application.yaml`
 3. `application.yml`
 4. `application.json`
@@ -192,13 +192,13 @@ First match wins. Environment variables are always added as final source.
 
 ## Logging
 
-Pico-Stack uses the `pico_stack` logger:
+Pico-Boot uses the `pico_boot` logger:
 
 ```python
 import logging
 
 # See plugin discovery
-logging.getLogger("pico_stack").setLevel(logging.DEBUG)
+logging.getLogger("pico_boot").setLevel(logging.DEBUG)
 
 # See all pico activity
 logging.getLogger("pico_ioc").setLevel(logging.DEBUG)
@@ -237,7 +237,7 @@ def init(
 ## Version
 
 ```python
-from pico_stack import __version__
+from pico_boot import __version__
 print(__version__)
 ```
 

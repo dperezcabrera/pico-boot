@@ -1,11 +1,11 @@
 # Plugins
 
-Pico-Stack uses Python entry points for zero-configuration plugin discovery.
+Pico-Boot uses Python entry points for zero-configuration plugin discovery.
 
 ## How Plugin Discovery Works
 
-1. When `init()` is called, Pico-Stack scans installed packages
-2. Packages with `pico_stack.modules` entry points are discovered
+1. When `init()` is called, Pico-Boot scans installed packages
+2. Packages with `pico_boot.modules` entry points are discovered
 3. The referenced modules are imported and added to the container
 4. Any `PICO_SCANNERS` defined in those modules are collected
 
@@ -24,7 +24,7 @@ pip install pico-fastapi pico-sqlalchemy pico-celery
 No additional configuration needed:
 
 ```python
-from pico_stack import init
+from pico_boot import init
 
 # Plugins are automatically discovered and loaded!
 container = init(modules=["myapp"])
@@ -36,7 +36,7 @@ Enable debug logging to see what's loaded:
 
 ```python
 import logging
-logging.getLogger("pico_stack").setLevel(logging.DEBUG)
+logging.getLogger("pico_boot").setLevel(logging.DEBUG)
 
 container = init(modules=["myapp"])
 ```
@@ -93,13 +93,13 @@ name = "my-plugin"
 version = "1.0.0"
 dependencies = ["pico-ioc>=2.2.0"]
 
-[project.entry-points."pico_stack.modules"]
+[project.entry-points."pico_boot.modules"]
 my_plugin = "my_plugin"
 ```
 
 The format is:
 ```
-[project.entry-points."pico_stack.modules"]
+[project.entry-points."pico_boot.modules"]
 <entry_name> = "<module_path>"
 ```
 
@@ -109,7 +109,7 @@ The format is:
 pip install -e ./my-plugin
 ```
 
-Now any application using Pico-Stack will automatically have your plugin!
+Now any application using Pico-Boot will automatically have your plugin!
 
 ## Custom Component Scanners
 
@@ -132,17 +132,17 @@ class MyCustomScanner(CustomScanner):
                 # Register with container
                 self.register_component(obj)
 
-# Export scanners for Pico-Stack to discover
+# Export scanners for Pico-Boot to discover
 PICO_SCANNERS = [MyCustomScanner()]
 ```
 
 ### Using the Scanner
 
-Pico-Stack automatically collects `PICO_SCANNERS` from all loaded modules:
+Pico-Boot automatically collects `PICO_SCANNERS` from all loaded modules:
 
 ```python
 # Application code - no changes needed!
-from pico_stack import init
+from pico_boot import init
 
 container = init(modules=["myapp"])  # Scanner is applied automatically
 ```
@@ -152,16 +152,16 @@ container = init(modules=["myapp"])  # Scanner is applied automatically
 For testing or explicit control:
 
 ```bash
-export PICO_STACK_AUTO_PLUGINS=false
+export PICO_BOOT_AUTO_PLUGINS=false
 ```
 
 Or programmatically:
 
 ```python
 import os
-os.environ["PICO_STACK_AUTO_PLUGINS"] = "false"
+os.environ["PICO_BOOT_AUTO_PLUGINS"] = "false"
 
-from pico_stack import init
+from pico_boot import init
 container = init(modules=["myapp"])  # Only myapp is loaded
 ```
 
@@ -246,14 +246,14 @@ class MyPluginService:
 
 1. Verify entry point is correct:
    ```bash
-   python -c "from importlib.metadata import entry_points; print([ep for ep in entry_points(group='pico_stack.modules')])"
+   python -c "from importlib.metadata import entry_points; print([ep for ep in entry_points(group='pico_boot.modules')])"
    ```
 
 2. Check for import errors:
    ```python
    import logging
    logging.basicConfig(level=logging.DEBUG)
-   from pico_stack import init
+   from pico_boot import init
    container = init(modules=["myapp"])
    ```
 

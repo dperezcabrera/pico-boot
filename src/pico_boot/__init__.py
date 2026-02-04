@@ -45,7 +45,7 @@ else:
                 result.append(m)
         return result
 
-    def _load_plugin_modules(group: str = "pico_stack.modules") -> List[ModuleType]:
+    def _load_plugin_modules(group: str = "pico_boot.modules") -> List[ModuleType]:
         eps = entry_points()
         if hasattr(eps, "select"):
             selected = eps.select(group=group)
@@ -57,12 +57,12 @@ else:
 
         for ep in selected:
             try:
-                if ep.module in ("pico_ioc", "pico_stack"):
+                if ep.module in ("pico_ioc", "pico_boot"):
                     continue
                 m = import_module(ep.module)
             except Exception as exc:
                 logger.warning(
-                    "Failed to load pico-stack plugin entry point '%s' (%s): %s",
+                    "Failed to load pico-boot plugin entry point '%s' (%s): %s",
                     ep.name,
                     ep.module,
                     exc,
@@ -84,7 +84,7 @@ else:
 
         base_modules = _normalize_modules(_to_module_list(bound.arguments["modules"]))
 
-        auto_flag = os.getenv("PICO_STACK_AUTO_PLUGINS", "true").lower()
+        auto_flag = os.getenv("PICO_BOOT_AUTO_PLUGINS", "true").lower()
         auto_plugins = auto_flag not in ("0", "false", "no")
 
         if auto_plugins:

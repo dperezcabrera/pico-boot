@@ -1,6 +1,6 @@
 import sys
 import traceback
-from pico_stack import init
+from pico_boot import init
 from pico_ioc import PicoContainer, configuration, DictSource
 
 try:
@@ -10,8 +10,8 @@ except ImportError:
     print("❌ CRITICAL ERROR: Could not import plugin modules directly.")
     sys.exit(1)
 
-def test_pico_stack_auto_discovery():
-    print("🚀 Starting pico-stack init()...")
+def test_pico_boot_auto_discovery():
+    print("🚀 Starting pico-boot init()...")
 
     minimal_config = configuration(
         DictSource({
@@ -40,7 +40,7 @@ def test_pico_stack_auto_discovery():
 
 if __name__ == "__main__":
     try:
-        test_pico_stack_auto_discovery()
+        test_pico_boot_auto_discovery()
         print("\n✨ SUCCESS: System integration works correctly.")
     except Exception as e:
         print(f"\n❌ FAILURE: {e}")

@@ -1,24 +1,24 @@
-# Getting Started with Pico-Stack
+# Getting Started with Pico-Boot
 
-This guide walks you through setting up your first application with Pico-Stack.
+This guide walks you through setting up your first application with Pico-Boot.
 
 ## Prerequisites
 
-- Python 3.10 or newer
+- Python 3.11 or newer
 - Basic understanding of dependency injection concepts
 
 ## Installation
 
 ```bash
-pip install pico-stack
+pip install pico-boot
 ```
 
-This installs both `pico-stack` and `pico-ioc` (the core DI container).
+This installs both `pico-boot` and `pico-ioc` (the core DI container).
 
 For YAML configuration support:
 
 ```bash
-pip install pico-stack pico-ioc[yaml]
+pip install pico-boot pico-ioc[yaml]
 ```
 
 ## Your First Application
@@ -52,7 +52,7 @@ class UserService:
 
 ```python
 # myapp/main.py
-from pico_stack import init
+from pico_boot import init
 from myapp.services import UserService
 
 def main():
@@ -135,12 +135,12 @@ class DatabaseService:
 
 ```python
 # myapp/main.py
-from pico_stack import init
+from pico_boot import init
 
 container = init(modules=["myapp.config", "myapp.services"])
 ```
 
-Pico-Stack automatically finds `application.yaml` and loads it!
+Pico-Boot automatically finds `application.yaml` and loads it!
 
 ## Environment Variable Overrides
 
@@ -160,7 +160,7 @@ Install integration packages and they're automatically discovered:
 pip install pico-fastapi pico-sqlalchemy
 ```
 
-No code changes needed - Pico-Stack finds and loads them automatically!
+No code changes needed - Pico-Boot finds and loads them automatically!
 
 ## Next Steps
 

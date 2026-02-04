@@ -8,7 +8,7 @@ WORKDIR /app
 RUN pip install --no-cache-dir build
 
 COPY pico-ioc ./pico-ioc
-COPY pico-stack ./pico-stack
+COPY pico-boot ./pico-boot
 COPY pico-fastapi ./pico-fastapi
 COPY pico-pydantic ./pico-pydantic
 COPY pico-sqlalchemy ./pico-sqlalchemy
@@ -17,7 +17,7 @@ COPY pico-sqlalchemy ./pico-sqlalchemy
 
 RUN mkdir /dist
 RUN python -m build ./pico-ioc --wheel --outdir /dist
-RUN python -m build ./pico-stack --wheel --outdir /dist
+RUN python -m build ./pico-boot --wheel --outdir /dist
 RUN python -m build ./pico-fastapi --wheel --outdir /dist
 RUN python -m build ./pico-pydantic --wheel --outdir /dist
 RUN python -m build ./pico-sqlalchemy --wheel --outdir /dist

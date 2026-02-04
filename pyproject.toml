@@ -3,18 +3,18 @@ requires = ["setuptools>=69.0", "wheel", "setuptools-scm>=8.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "pico-stack"
+name = "pico-boot"
 dynamic = ["version"]
 authors = [{ name = "David Perez Cabrera", email = "dperezcabrera@gmail.com" }]
 description = "Pico-IOC integration layer for ecosystem modules. Auto-discovers DI modules via entry points."
 readme = { file = "README.md", content-type = "text/markdown" }
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = { file = "LICENSE" }
 keywords = [
     "ioc",
     "di",
     "dependency injection",
-    "stack",
+    "boot",
     "inversion of control",
     "asyncio",
     "plugins",
@@ -25,7 +25,6 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
@@ -50,11 +49,11 @@ test = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/dperezcabrera/pico-stack"
-Repository = "https://github.com/dperezcabrera/pico-stack"
-"Issue Tracker" = "https://github.com/dperezcabrera/pico-stack/issues"
+Homepage = "https://github.com/dperezcabrera/pico-boot"
+Repository = "https://github.com/dperezcabrera/pico-boot"
+"Issue Tracker" = "https://github.com/dperezcabrera/pico-boot/issues"
 
-[project.entry-points."pico_stack.modules"]
+[project.entry-points."pico_boot.modules"]
 # This package does NOT self-register (as discussed), so leave it empty or omit entirely.
 
 [tool.setuptools]
@@ -62,11 +61,11 @@ package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["pico_stack*"]
+include = ["pico_boot*"]
 
 [tool.setuptools_scm]
 version_scheme = "post-release"
 local_scheme = "no-local-version"
 fallback_version = "0.1.0"
-write_to = "src/pico_stack/_version.py"
+write_to = "src/pico_boot/_version.py"
 write_to_template = "__version__ = '{version}'\n"

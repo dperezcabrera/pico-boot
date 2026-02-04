@@ -11,7 +11,7 @@ The Pico framework consists of multiple packages that work together seamlessly.
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                         pico-stack                              │
+│                         pico-boot                              │
 │              Zero-configuration bootstrap layer                  │
 │         (auto-discovery, config loading, scanner harvest)       │
 └─────────────────────────────┬───────────────────────────────────┘
@@ -69,15 +69,15 @@ pip install pico-ioc
 pip install pico-ioc[yaml]  # For YAML config support
 ```
 
-### pico-stack
+### pico-boot
 
 Zero-configuration bootstrap layer. Recommended for applications.
 
 | | |
 |---|---|
-| **PyPI** | [pico-stack](https://pypi.org/project/pico-stack/) |
-| **Repository** | [github.com/dperezcabrera/pico-stack](https://github.com/dperezcabrera/pico-stack) |
-| **Documentation** | [dperezcabrera.github.io/pico-stack](https://dperezcabrera.github.io/pico-stack/) |
+| **PyPI** | [pico-boot](https://pypi.org/project/pico-boot/) |
+| **Repository** | [github.com/dperezcabrera/pico-boot](https://github.com/dperezcabrera/pico-boot) |
+| **Documentation** | [dperezcabrera.github.io/pico-boot](https://dperezcabrera.github.io/pico-boot/) |
 
 **Features:**
 - Auto-discovery of plugins via entry points
@@ -87,7 +87,7 @@ Zero-configuration bootstrap layer. Recommended for applications.
 
 **Installation:**
 ```bash
-pip install pico-stack
+pip install pico-boot
 ```
 
 ---
@@ -112,7 +112,7 @@ FastAPI integration with automatic dependency injection in routes.
 **Usage:**
 ```python
 from fastapi import FastAPI
-from pico_stack import init
+from pico_boot import init
 from pico_fastapi import PicoFastAPI
 
 app = FastAPI()
@@ -202,11 +202,11 @@ class UserService:
 
 | Package | pico-ioc Version | Python |
 |---------|------------------|--------|
-| pico-stack | >= 2.1.3 | 3.10+ |
-| pico-fastapi | >= 2.0.0 | 3.10+ |
-| pico-sqlalchemy | >= 2.0.0 | 3.10+ |
-| pico-celery | >= 2.0.0 | 3.10+ |
-| pico-pydantic | >= 2.0.0 | 3.10+ |
+| pico-boot | >= 2.1.3 | 3.11+ |
+| pico-fastapi | >= 2.0.0 | 3.11+ |
+| pico-sqlalchemy | >= 2.0.0 | 3.11+ |
+| pico-celery | >= 2.0.0 | 3.11+ |
+| pico-pydantic | >= 2.0.0 | 3.11+ |
 
 ---
 
@@ -215,7 +215,7 @@ class UserService:
 Install everything:
 
 ```bash
-pip install pico-stack pico-fastapi pico-sqlalchemy pico-pydantic
+pip install pico-boot pico-fastapi pico-sqlalchemy pico-pydantic
 ```
 
 Create `application.yaml`:
@@ -235,7 +235,7 @@ Create your application:
 ```python
 # main.py
 from fastapi import FastAPI
-from pico_stack import init
+from pico_boot import init
 from pico_fastapi import PicoFastAPI
 from pico_ioc import component
 from sqlalchemy.orm import Session
@@ -269,13 +269,13 @@ All integrations are loaded automatically!
 
 ## Creating Your Own Integration
 
-See [Creating Plugins](./creating-plugins.md) for a complete guide on building your own Pico-Stack integration.
+See [Creating Plugins](./creating-plugins.md) for a complete guide on building your own Pico-Boot integration.
 
 Key steps:
 
 1. Add entry point to `pyproject.toml`:
    ```toml
-   [project.entry-points."pico_stack.modules"]
+   [project.entry-points."pico_boot.modules"]
    my_integration = "my_integration"
    ```
 

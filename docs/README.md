@@ -1,6 +1,6 @@
-# Pico-Stack Documentation
+# Pico-Boot Documentation
 
-Welcome to the Pico-Stack documentation.
+Welcome to the Pico-Boot documentation.
 
 ## Contents
 
@@ -13,7 +13,7 @@ Welcome to the Pico-Stack documentation.
 
 ## Overview
 
-Pico-Stack is the recommended way to bootstrap applications in the Pico ecosystem. It wraps `pico-ioc` with:
+Pico-Boot is the recommended way to bootstrap applications in the Pico ecosystem. It wraps `pico-ioc` with:
 
 1. **Zero-config plugin discovery** - Install a package, it's automatically available
 2. **Automatic configuration** - Drop a YAML file, it's loaded automatically
@@ -23,7 +23,7 @@ Pico-Stack is the recommended way to bootstrap applications in the Pico ecosyste
 
 ```python
 from pico_ioc import component
-from pico_stack import init
+from pico_boot import init
 
 @component
 class MyService:
@@ -33,9 +33,9 @@ container = init(modules=[__name__])
 service = container.get(MyService)
 ```
 
-## When to Use Pico-Stack
+## When to Use Pico-Boot
 
-Use Pico-Stack when:
+Use Pico-Boot when:
 - You're building an application (not a library)
 - You want automatic plugin discovery
 - You want convention-over-configuration

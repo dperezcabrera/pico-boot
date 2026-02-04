@@ -1,25 +1,25 @@
-# Creating Pico-Stack Plugins
+# Creating Pico-Boot Plugins
 
-This guide explains how to create libraries that integrate automatically with Pico-Stack.
+This guide explains how to create libraries that integrate automatically with Pico-Boot.
 
 ## How Plugin Discovery Works
 
-Pico-Stack uses Python's [entry points](https://packaging.python.org/en/latest/specifications/entry-points/) mechanism to discover plugins at runtime.
+Pico-Boot uses Python's [entry points](https://packaging.python.org/en/latest/specifications/entry-points/) mechanism to discover plugins at runtime.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                      Application                            │
 │                                                             │
-│  from pico_stack import init                                │
+│  from pico_boot import init                                │
 │  container = init(modules=["myapp"])                        │
 │                                                             │
 └─────────────────────┬───────────────────────────────────────┘
                       │
                       ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                     Pico-Stack                              │
+│                     Pico-Boot                              │
 │                                                             │
-│  1. Scan entry_points(group="pico_stack.modules")           │
+│  1. Scan entry_points(group="pico_boot.modules")           │
 │  2. Import each discovered module                           │
 │  3. Collect PICO_SCANNERS from modules                      │
 │  4. Merge with user modules                                 │
@@ -55,7 +55,7 @@ my-pico-plugin/
 
 ### 2. Define Your pyproject.toml
 
-The key is the `[project.entry-points."pico_stack.modules"]` section:
+The key is the `[project.entry-points."pico_boot.modules"]` section:
 
 ```toml
 [build-system]
@@ -65,21 +65,21 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "my-pico-plugin"
 version = "1.0.0"
-description = "My awesome Pico-Stack plugin"
-requires-python = ">=3.10"
+description = "My awesome Pico-Boot plugin"
+requires-python = ">=3.11"
 dependencies = [
     "pico-ioc>=2.1.3",
 ]
 
 # This is the magic line that makes auto-discovery work!
-[project.entry-points."pico_stack.modules"]
+[project.entry-points."pico_boot.modules"]
 my_plugin = "my_plugin"
 ```
 
 **Entry Point Format:**
 
 ```toml
-[project.entry-points."pico_stack.modules"]
+[project.entry-points."pico_boot.modules"]
 <name> = "<module_path>"
 ```
 
@@ -91,7 +91,7 @@ my_plugin = "my_plugin"
 ```python
 # src/my_plugin/__init__.py
 """
-My Pico-Stack Plugin
+My Pico-Boot Plugin
 
 Provides integration with SomeService.
 """
@@ -217,7 +217,7 @@ class MyCustomScanner(CustomScanner):
                 # Register with container
                 self.register_component(obj)
 
-# Export for Pico-Stack to discover
+# Export for Pico-Boot to discover
 PICO_SCANNERS = [MyCustomScanner()]
 ```
 
@@ -235,8 +235,8 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "pico-redis"
 version = "1.0.0"
-description = "Redis integration for Pico-Stack"
-requires-python = ">=3.10"
+description = "Redis integration for Pico-Boot"
+requires-python = ">=3.11"
 license = {text = "MIT"}
 dependencies = [
     "pico-ioc>=2.1.3",
@@ -246,7 +246,7 @@ dependencies = [
 [project.optional-dependencies]
 test = ["pytest>=8", "pytest-asyncio>=0.23"]
 
-[project.entry-points."pico_stack.modules"]
+[project.entry-points."pico_boot.modules"]
 pico_redis = "pico_redis"
 
 [tool.setuptools]
@@ -260,7 +260,7 @@ where = ["src"]
 
 ```python
 """
-Pico-Redis: Redis integration for Pico-Stack
+Pico-Redis: Redis integration for Pico-Boot
 
 Usage:
     1. Install: pip install pico-redis
@@ -356,7 +356,7 @@ def test_plugin_loads():
     container.shutdown()
 ```
 
-### Integration Test with Pico-Stack
+### Integration Test with Pico-Boot
 
 ```python
 # tests/test_integration.py
@@ -364,10 +364,10 @@ import os
 import pytest
 
 def test_auto_discovery():
-    """Verify plugin is discovered by pico-stack."""
+    """Verify plugin is discovered by pico-boot."""
     os.environ["MY_PLUGIN_API_KEY"] = "test-key"
 
-    from pico_stack import init
+    from pico_boot import init
     from my_plugin import MyPluginService
 
     container = init(modules=[])  # Empty - relies on auto-discovery
@@ -488,14 +488,14 @@ class MockCache:
 
 1. Verify entry point is correct:
    ```bash
-   python -c "from importlib.metadata import entry_points; print([ep for ep in entry_points(group='pico_stack.modules')])"
+   python -c "from importlib.metadata import entry_points; print([ep for ep in entry_points(group='pico_boot.modules')])"
    ```
 
 2. Check for import errors:
    ```python
    import logging
-   logging.getLogger("pico_stack").setLevel(logging.DEBUG)
-   from pico_stack import init
+   logging.getLogger("pico_boot").setLevel(logging.DEBUG)
+   from pico_boot import init
    container = init(modules=[])
    ```
 

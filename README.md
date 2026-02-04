@@ -1,38 +1,38 @@
-# Pico-Stack
+# Pico-Boot
 
-[![PyPI](https://img.shields.io/pypi/v/pico-stack.svg)](https://pypi.org/project/pico-stack/)
+[![PyPI](https://img.shields.io/pypi/v/pico-boot.svg)](https://pypi.org/project/pico-boot/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-![CI (tox matrix)](https://github.com/dperezcabrera/pico-stack/actions/workflows/ci.yml/badge.svg)
-[![codecov](https://codecov.io/gh/dperezcabrera/pico-stack/branch/main/graph/badge.svg)](https://codecov.io/gh/dperezcabrera/pico-stack)
-[![Docs](https://img.shields.io/badge/Docs-pico--stack-blue?style=flat&logo=readthedocs&logoColor=white)](https://dperezcabrera.github.io/pico-stack/)
+![CI (tox matrix)](https://github.com/dperezcabrera/pico-boot/actions/workflows/ci.yml/badge.svg)
+[![codecov](https://codecov.io/gh/dperezcabrera/pico-boot/branch/main/graph/badge.svg)](https://codecov.io/gh/dperezcabrera/pico-boot)
+[![Docs](https://img.shields.io/badge/Docs-pico--stack-blue?style=flat&logo=readthedocs&logoColor=white)](https://dperezcabrera.github.io/pico-boot/)
 
 **Zero-configuration bootstrap for the Pico ecosystem.**
 
-Pico-Stack is a thin orchestration layer over [pico-ioc](https://github.com/dperezcabrera/pico-ioc) that provides:
+Pico-Boot is a thin orchestration layer over [pico-ioc](https://github.com/dperezcabrera/pico-ioc) that provides:
 
 - **Auto-discovery of plugins** via Python entry points
 - **Automatic configuration loading** from YAML/JSON files and environment variables
 - **Custom scanner harvesting** from loaded modules
 
-> 🐍 Requires Python 3.10+
+> 🐍 Requires Python 3.11+
 
 ---
 
-## When to Use Pico-Stack vs Pico-IoC
+## When to Use Pico-Boot vs Pico-IoC
 
 | Use Case | Recommendation |
 |----------|----------------|
 | Simple app, manual control | Use `pico-ioc` directly |
-| Multiple pico-* integrations (fastapi, sqlalchemy, celery) | Use `pico-stack` |
-| Want zero-config plugin discovery | Use `pico-stack` |
-| Want automatic config file loading | Use `pico-stack` |
+| Multiple pico-* integrations (fastapi, sqlalchemy, celery) | Use `pico-boot` |
+| Want zero-config plugin discovery | Use `pico-boot` |
+| Want automatic config file loading | Use `pico-boot` |
 
 ---
 
 ## Installation
 
 ```bash
-pip install pico-stack
+pip install pico-boot
 ```
 
 This automatically installs `pico-ioc` as a dependency.
@@ -46,7 +46,7 @@ This automatically installs `pico-ioc` as a dependency.
 ```python
 # app.py
 from pico_ioc import component, provides
-from pico_stack import init
+from pico_boot import init
 
 @component
 class Database:
@@ -58,7 +58,7 @@ class UserService:
     def __init__(self, db: Database):
         self.db = db
 
-# pico-stack's init() replaces pico-ioc's init()
+# pico-boot's init() replaces pico-ioc's init()
 # It auto-discovers plugins and loads configuration
 container = init(modules=[__name__])
 
@@ -99,7 +99,7 @@ class AppConfig:
     debug: bool = False
 ```
 
-Pico-Stack automatically finds and loads `application.yaml` - no configuration code needed!
+Pico-Boot automatically finds and loads `application.yaml` - no configuration code needed!
 
 ---
 
@@ -114,7 +114,7 @@ pip install pico-fastapi pico-sqlalchemy pico-celery
 ```
 
 ```python
-from pico_stack import init
+from pico_boot import init
 
 # All installed pico-* plugins are automatically loaded!
 container = init(modules=["myapp"])
@@ -124,9 +124,9 @@ No need to explicitly import or configure each integration.
 
 ### 2. Automatic Configuration Loading
 
-Pico-Stack searches for configuration files in this order:
+Pico-Boot searches for configuration files in this order:
 
-1. Custom path via `PICO_STACK_CONFIG_FILE` environment variable
+1. Custom path via `PICO_BOOT_CONFIG_FILE` environment variable
 2. `application.yaml` / `application.yml` / `application.json`
 3. `settings.yaml` / `settings.yml` / `settings.json`
 
@@ -148,7 +148,7 @@ class MyScanner(CustomScanner):
 PICO_SCANNERS = [MyScanner()]
 ```
 
-Pico-Stack automatically collects and applies these scanners.
+Pico-Boot automatically collects and applies these scanners.
 
 ---
 
@@ -156,25 +156,25 @@ Pico-Stack automatically collects and applies these scanners.
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `PICO_STACK_AUTO_PLUGINS` | `true` | Enable/disable plugin auto-discovery |
-| `PICO_STACK_CONFIG_FILE` | - | Custom configuration file path |
+| `PICO_BOOT_AUTO_PLUGINS` | `true` | Enable/disable plugin auto-discovery |
+| `PICO_BOOT_CONFIG_FILE` | - | Custom configuration file path |
 
 ### Disabling Auto-Discovery
 
 ```bash
-export PICO_STACK_AUTO_PLUGINS=false
+export PICO_BOOT_AUTO_PLUGINS=false
 ```
 
 Useful for testing or when you want explicit control.
 
 ---
 
-## Creating a Pico-Stack Plugin
+## Creating a Pico-Boot Plugin
 
-To make your library discoverable by pico-stack, add an entry point in `pyproject.toml`:
+To make your library discoverable by pico-boot, add an entry point in `pyproject.toml`:
 
 ```toml
-[project.entry-points."pico_stack.modules"]
+[project.entry-points."pico_boot.modules"]
 my_library = "my_library"
 ```
 
@@ -198,13 +198,13 @@ def build_redis(config: RedisConfig) -> redis.Redis:
 
 ```toml
 # pyproject.toml
-[project.entry-points."pico_stack.modules"]
+[project.entry-points."pico_boot.modules"]
 pico_redis = "pico_redis"
 ```
 
-Now any app using pico-stack will automatically have Redis available!
+Now any app using pico-boot will automatically have Redis available!
 
-For a complete guide, see the [Creating Plugins](https://dperezcabrera.github.io/pico-stack/creating-plugins/) documentation.
+For a complete guide, see the [Creating Plugins](https://dperezcabrera.github.io/pico-boot/creating-plugins/) documentation.
 
 ---
 
@@ -276,7 +276,7 @@ class GreetingService:
 ### main.py
 
 ```python
-from pico_stack import init
+from pico_boot import init
 from .services import GreetingService
 
 def main():
@@ -314,7 +314,7 @@ Welcome to Production App, Alice!
 
 Drop-in replacement for `pico_ioc.init()` with additional features:
 
-- Auto-discovers plugins from `pico_stack.modules` entry points
+- Auto-discovers plugins from `pico_boot.modules` entry points
 - Harvests custom scanners from loaded modules
 - Applies default configuration (files + environment) if none provided
 
@@ -335,19 +335,19 @@ container = init(
 
 ## Documentation
 
-Full documentation is available at [dperezcabrera.github.io/pico-stack](https://dperezcabrera.github.io/pico-stack/).
+Full documentation is available at [dperezcabrera.github.io/pico-boot](https://dperezcabrera.github.io/pico-boot/).
 
-- [Getting Started](https://dperezcabrera.github.io/pico-stack/getting-started/)
-- [Configuration](https://dperezcabrera.github.io/pico-stack/configuration/)
-- [Creating Plugins](https://dperezcabrera.github.io/pico-stack/creating-plugins/)
-- [API Reference](https://dperezcabrera.github.io/pico-stack/api-reference/)
-- [Ecosystem](https://dperezcabrera.github.io/pico-stack/ecosystem/)
+- [Getting Started](https://dperezcabrera.github.io/pico-boot/getting-started/)
+- [Configuration](https://dperezcabrera.github.io/pico-boot/configuration/)
+- [Creating Plugins](https://dperezcabrera.github.io/pico-boot/creating-plugins/)
+- [API Reference](https://dperezcabrera.github.io/pico-boot/api-reference/)
+- [Ecosystem](https://dperezcabrera.github.io/pico-boot/ecosystem/)
 
 ---
 
 ## Ecosystem
 
-Pico-Stack works with these integration packages:
+Pico-Boot works with these integration packages:
 
 | Package | Description |
 |---------|-------------|

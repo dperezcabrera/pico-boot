@@ -1,10 +1,10 @@
 # Configuration
 
-Pico-Stack provides automatic configuration loading with sensible defaults.
+Pico-Boot provides automatic configuration loading with sensible defaults.
 
 ## How It Works
 
-When you call `init()` without a custom `config` parameter, Pico-Stack:
+When you call `init()` without a custom `config` parameter, Pico-Boot:
 
 1. Searches for configuration files in the current directory
 2. Loads matching files (YAML/JSON)
@@ -12,9 +12,9 @@ When you call `init()` without a custom `config` parameter, Pico-Stack:
 
 ## Configuration File Discovery
 
-Pico-Stack looks for files in this order:
+Pico-Boot looks for files in this order:
 
-1. Path specified by `PICO_STACK_CONFIG_FILE` environment variable
+1. Path specified by `PICO_BOOT_CONFIG_FILE` environment variable
 2. `application.yaml`
 3. `application.yml`
 4. `application.json`
@@ -109,10 +109,10 @@ The application sees `host = "prod-db.example.com"`.
 
 ## Custom Configuration Path
 
-Use `PICO_STACK_CONFIG_FILE` to specify a custom path:
+Use `PICO_BOOT_CONFIG_FILE` to specify a custom path:
 
 ```bash
-$ PICO_STACK_CONFIG_FILE=/etc/myapp/config.yaml python app.py
+$ PICO_BOOT_CONFIG_FILE=/etc/myapp/config.yaml python app.py
 ```
 
 ## Disabling Auto-Configuration
@@ -121,7 +121,7 @@ If you need full control, pass your own `config`:
 
 ```python
 from pico_ioc import configuration, EnvSource
-from pico_stack import init
+from pico_boot import init
 
 # Custom configuration
 my_config = configuration(
@@ -131,7 +131,7 @@ my_config = configuration(
 container = init(modules=["myapp"], config=my_config)
 ```
 
-When `config` is provided, Pico-Stack **does not** apply its defaults.
+When `config` is provided, Pico-Boot **does not** apply its defaults.
 
 ## Nested Configuration
 
@@ -254,7 +254,7 @@ class LoggingConfig:
 
 ```python
 # main.py
-from pico_stack import init
+from pico_boot import init
 
 container = init(modules=["config", "services"])
 app_config = container.get(AppConfig)

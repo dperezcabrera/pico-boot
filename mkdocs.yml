@@ -1,11 +1,11 @@
-site_name: Pico-Stack Documentation
+site_name: Pico-Boot Documentation
 site_description: Zero-configuration bootstrap for the Pico ecosystem
-site_url: https://dperezcabrera.github.io/pico-stack/
+site_url: https://dperezcabrera.github.io/pico-boot/
 
-repo_name: dperezcabrera/pico-stack
-repo_url: https://github.com/dperezcabrera/pico-stack
+repo_name: dperezcabrera/pico-boot
+repo_url: https://github.com/dperezcabrera/pico-boot
 edit_uri: edit/main/docs/
-copyright: Copyright © 2025 Pico-Stack
+copyright: Copyright © 2025 Pico-Boot
 
 strict: true
 
@@ -62,9 +62,9 @@ theme:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/dperezcabrera/pico-stack
+      link: https://github.com/dperezcabrera/pico-boot
     - icon: fontawesome/brands/python
-      link: https://pypi.org/project/pico-stack/
+      link: https://pypi.org/project/pico-boot/
 
 markdown_extensions:
   - abbr
