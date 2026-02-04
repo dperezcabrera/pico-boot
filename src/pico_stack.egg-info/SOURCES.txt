@@ -1,0 +1,14 @@
+.coveragerc
+LICENSE
+MANIFEST.in
+README.md
+pyproject.toml
+tox.ini
+src/pico_stack/__init__.py
+src/pico_stack/_version.py
+src/pico_stack.egg-info/PKG-INFO
+src/pico_stack.egg-info/SOURCES.txt
+src/pico_stack.egg-info/dependency_links.txt
+src/pico_stack.egg-info/requires.txt
+src/pico_stack.egg-info/top_level.txt
+tests/test_stack_integration.py
