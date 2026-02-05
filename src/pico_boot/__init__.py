@@ -45,6 +45,14 @@ else:
                 result.append(m)
         return result
 
+    def _harvest_scanners(modules: List[ModuleType]) -> list:
+        scanners: list = []
+        for m in modules:
+            module_scanners = getattr(m, "PICO_SCANNERS", None)
+            if module_scanners:
+                scanners.extend(module_scanners)
+        return scanners
+
     def _load_plugin_modules(group: str = "pico_boot.modules") -> List[ModuleType]:
         eps = entry_points()
         if hasattr(eps, "select"):
@@ -94,6 +102,11 @@ else:
             all_modules = base_modules
 
         bound.arguments["modules"] = all_modules
+
+        harvested = _harvest_scanners(all_modules)
+        if harvested:
+            existing = bound.arguments.get("custom_scanners") or []
+            bound.arguments["custom_scanners"] = list(existing) + harvested
 
         return _ioc_init(*bound.args, **bound.kwargs)
 

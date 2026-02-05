@@ -13,7 +13,7 @@ from pico_boot import init
 
 container = init(
     modules=["myapp"],           # Required: modules to scan
-    config=None,                 # Optional: ContextConfig (auto-detected if None)
+    config=None,                 # Optional: ContextConfig
     profiles=(),                 # Optional: active profiles
     overrides={},                # Optional: component overrides for testing
     observers=[],                # Optional: ContainerObserver instances
@@ -26,7 +26,7 @@ container = init(
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `modules` | `Iterable[str \| ModuleType]` | Required | Modules to scan for components |
-| `config` | `ContextConfig \| None` | `None` | Configuration context. If `None`, auto-detected |
+| `config` | `ContextConfig \| None` | `None` | Configuration context (built via `pico_ioc.configuration()`) |
 | `profiles` | `tuple[str, ...]` | `()` | Active profiles for conditional components |
 | `overrides` | `dict[type, Any]` | `{}` | Replace components (useful for testing) |
 | `observers` | `list[ContainerObserver]` | `[]` | Lifecycle observers |
@@ -40,10 +40,8 @@ container = init(
 
 1. Normalizes and deduplicates provided modules
 2. Discovers plugins from `pico_boot.modules` entry points (if enabled)
-3. Harvests `PICO_SCANNERS` from all loaded modules
-4. If `config` is `None`, builds default configuration:
-   - Searches for `application.yaml/yml/json` or `settings.yaml/yml/json`
-   - Adds environment variable source
+3. Merges user modules with discovered plugin modules
+4. Harvests `PICO_SCANNERS` from all loaded modules and merges with user-provided `custom_scanners`
 5. Delegates to `pico_ioc.init()` with enriched parameters
 
 #### Example
@@ -88,16 +86,6 @@ Controls automatic plugin discovery.
 # Disable auto-discovery
 export PICO_BOOT_AUTO_PLUGINS=false
 ```
-
-### `PICO_BOOT_CONFIG_FILE`
-
-Specify a custom configuration file path.
-
-```bash
-export PICO_BOOT_CONFIG_FILE=/etc/myapp/config.yaml
-```
-
-Takes precedence over default file discovery.
 
 ---
 
@@ -169,24 +157,7 @@ These are implementation details and may change:
 | `_import_module_like()` | Imports module from various input types |
 | `_normalize_modules()` | Deduplicates modules by name |
 | `_load_plugin_modules()` | Discovers entry point plugins |
-| `_build_default_config()` | Creates default ContextConfig |
 | `_harvest_scanners()` | Collects PICO_SCANNERS from modules |
-
----
-
-## Configuration File Search Order
-
-When `config=None`:
-
-1. `$PICO_BOOT_CONFIG_FILE` (if set)
-2. `application.yaml`
-3. `application.yml`
-4. `application.json`
-5. `settings.yaml`
-6. `settings.yml`
-7. `settings.json`
-
-First match wins. Environment variables are always added as final source.
 
 ---
 
@@ -208,9 +179,7 @@ Log messages:
 
 | Level | Message |
 |-------|---------|
-| INFO | Auto-configuration file loading |
 | WARNING | Plugin load failures |
-| DEBUG | No config provided, applying defaults |
 
 ---
 
@@ -236,9 +205,9 @@ def init(
 
 ## Version
 
+Version is managed by `setuptools-scm` from git tags.
+
 ```python
-from pico_boot import __version__
+from pico_boot._version import __version__
 print(__version__)
 ```
-
-Note: Version is managed by `setuptools-scm` from git tags.

@@ -11,7 +11,6 @@
 Pico-Boot is a thin orchestration layer over [pico-ioc](https://github.com/dperezcabrera/pico-ioc) that provides:
 
 - **Auto-discovery of plugins** via Python entry points
-- **Automatic configuration loading** from YAML/JSON files and environment variables
 - **Custom scanner harvesting** from loaded modules
 
 > 🐍 Requires Python 3.11+
@@ -25,7 +24,6 @@ Pico-Boot is a thin orchestration layer over [pico-ioc](https://github.com/dpere
 | Simple app, manual control | Use `pico-ioc` directly |
 | Multiple pico-* integrations (fastapi, sqlalchemy, celery) | Use `pico-boot` |
 | Want zero-config plugin discovery | Use `pico-boot` |
-| Want automatic config file loading | Use `pico-boot` |
 
 ---
 
@@ -59,47 +57,12 @@ class UserService:
         self.db = db
 
 # pico-boot's init() replaces pico-ioc's init()
-# It auto-discovers plugins and loads configuration
+# It auto-discovers plugins and harvests custom scanners
 container = init(modules=[__name__])
 
 service = container.get(UserService)
 print(service.db.query())
 ```
-
-### With Configuration File
-
-Create `application.yaml` in your project root:
-
-```yaml
-# application.yaml
-database:
-  host: localhost
-  port: 5432
-  name: myapp
-
-app:
-  debug: true
-```
-
-```python
-# config.py
-from dataclasses import dataclass
-from pico_ioc import configured
-
-@configured(prefix="database")
-@dataclass
-class DatabaseConfig:
-    host: str
-    port: int
-    name: str
-
-@configured(prefix="app")
-@dataclass
-class AppConfig:
-    debug: bool = False
-```
-
-Pico-Boot automatically finds and loads `application.yaml` - no configuration code needed!
 
 ---
 
@@ -122,17 +85,7 @@ container = init(modules=["myapp"])
 
 No need to explicitly import or configure each integration.
 
-### 2. Automatic Configuration Loading
-
-Pico-Boot searches for configuration files in this order:
-
-1. Custom path via `PICO_BOOT_CONFIG_FILE` environment variable
-2. `application.yaml` / `application.yml` / `application.json`
-3. `settings.yaml` / `settings.yml` / `settings.json`
-
-Environment variables always override file values.
-
-### 3. Custom Scanner Harvesting
+### 2. Custom Scanner Harvesting
 
 Modules can expose custom component scanners via `PICO_SCANNERS`:
 
@@ -157,7 +110,6 @@ Pico-Boot automatically collects and applies these scanners.
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `PICO_BOOT_AUTO_PLUGINS` | `true` | Enable/disable plugin auto-discovery |
-| `PICO_BOOT_CONFIG_FILE` | - | Custom configuration file path |
 
 ### Disabling Auto-Discovery
 
@@ -276,12 +228,17 @@ class GreetingService:
 ### main.py
 
 ```python
+from pico_ioc import configuration, YamlSource, EnvSource
 from pico_boot import init
 from .services import GreetingService
 
 def main():
-    # Auto-loads application.yaml + discovers plugins
-    container = init(modules=["myapp.config", "myapp.services"])
+    # Load configuration via pico-ioc, let pico-boot discover plugins
+    config = configuration(
+        YamlSource("application.yaml"),
+        EnvSource()
+    )
+    container = init(modules=["myapp.config", "myapp.services"], config=config)
 
     service = container.get(GreetingService)
     print(service.greet("Alice"))
@@ -315,8 +272,7 @@ Welcome to Production App, Alice!
 Drop-in replacement for `pico_ioc.init()` with additional features:
 
 - Auto-discovers plugins from `pico_boot.modules` entry points
-- Harvests custom scanners from loaded modules
-- Applies default configuration (files + environment) if none provided
+- Harvests custom scanners (`PICO_SCANNERS`) from loaded modules
 
 All parameters from `pico_ioc.init()` are supported:
 

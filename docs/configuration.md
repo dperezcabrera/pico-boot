@@ -1,28 +1,24 @@
 # Configuration
 
-Pico-Boot provides automatic configuration loading with sensible defaults.
+Configuration in the Pico ecosystem is handled by **pico-ioc**. Pico-Boot does not load configuration files automatically — it focuses on plugin discovery and scanner harvesting.
 
 ## How It Works
 
-When you call `init()` without a custom `config` parameter, Pico-Boot:
+You build a `ContextConfig` using pico-ioc's `configuration()` function and pass it to `init()`:
 
-1. Searches for configuration files in the current directory
-2. Loads matching files (YAML/JSON)
-3. Overlays environment variables on top
+```python
+from pico_ioc import configuration, YamlSource, EnvSource
+from pico_boot import init
 
-## Configuration File Discovery
+config = configuration(
+    YamlSource("application.yaml"),
+    EnvSource()  # Environment variables override file values
+)
 
-Pico-Boot looks for files in this order:
+container = init(modules=["myapp"], config=config)
+```
 
-1. Path specified by `PICO_BOOT_CONFIG_FILE` environment variable
-2. `application.yaml`
-3. `application.yml`
-4. `application.json`
-5. `settings.yaml`
-6. `settings.yml`
-7. `settings.json`
-
-The first matching file is loaded. Multiple files are **not** merged.
+If you don't pass `config`, no configuration sources are loaded (pico-ioc defaults apply).
 
 ## File Formats
 
@@ -79,7 +75,7 @@ The `prefix` maps to the YAML structure:
 
 ## Environment Variable Overrides
 
-Environment variables **always override** file values.
+When using `EnvSource`, environment variables **override** file values.
 
 ### Naming Convention
 
@@ -106,32 +102,6 @@ $ DATABASE_HOST=prod-db.example.com python app.py
 ```
 
 The application sees `host = "prod-db.example.com"`.
-
-## Custom Configuration Path
-
-Use `PICO_BOOT_CONFIG_FILE` to specify a custom path:
-
-```bash
-$ PICO_BOOT_CONFIG_FILE=/etc/myapp/config.yaml python app.py
-```
-
-## Disabling Auto-Configuration
-
-If you need full control, pass your own `config`:
-
-```python
-from pico_ioc import configuration, EnvSource
-from pico_boot import init
-
-# Custom configuration
-my_config = configuration(
-    EnvSource(prefix="MYAPP_")
-)
-
-container = init(modules=["myapp"], config=my_config)
-```
-
-When `config` is provided, Pico-Boot **does not** apply its defaults.
 
 ## Nested Configuration
 
@@ -254,9 +224,15 @@ class LoggingConfig:
 
 ```python
 # main.py
+from pico_ioc import configuration, YamlSource, EnvSource
 from pico_boot import init
 
-container = init(modules=["config", "services"])
+config = configuration(
+    YamlSource("application.yaml"),
+    EnvSource()
+)
+
+container = init(modules=["config", "services"], config=config)
 app_config = container.get(AppConfig)
 print(f"Starting {app_config.name} v{app_config.version}")
 ```

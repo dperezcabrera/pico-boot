@@ -13,7 +13,7 @@ The Pico framework consists of multiple packages that work together seamlessly.
 ┌─────────────────────────────────────────────────────────────────┐
 │                         pico-boot                              │
 │              Zero-configuration bootstrap layer                  │
-│         (auto-discovery, config loading, scanner harvest)       │
+│         (auto-discovery, scanner harvesting)                    │
 └─────────────────────────────┬───────────────────────────────────┘
                               │
                               ▼
@@ -81,7 +81,6 @@ Zero-configuration bootstrap layer. Recommended for applications.
 
 **Features:**
 - Auto-discovery of plugins via entry points
-- Automatic configuration file loading
 - Custom scanner harvesting
 - Drop-in replacement for `pico_ioc.init()`
 
@@ -202,7 +201,7 @@ class UserService:
 
 | Package | pico-ioc Version | Python |
 |---------|------------------|--------|
-| pico-boot | >= 2.1.3 | 3.11+ |
+| pico-boot | >= 2.1.0 | 3.11+ |
 | pico-fastapi | >= 2.0.0 | 3.11+ |
 | pico-sqlalchemy | >= 2.0.0 | 3.11+ |
 | pico-celery | >= 2.0.0 | 3.11+ |

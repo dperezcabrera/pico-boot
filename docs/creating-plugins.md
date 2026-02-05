@@ -68,7 +68,7 @@ version = "1.0.0"
 description = "My awesome Pico-Boot plugin"
 requires-python = ">=3.11"
 dependencies = [
-    "pico-ioc>=2.1.3",
+    "pico-ioc>=2.2.0",
 ]
 
 # This is the magic line that makes auto-discovery work!
@@ -239,7 +239,7 @@ description = "Redis integration for Pico-Boot"
 requires-python = ">=3.11"
 license = {text = "MIT"}
 dependencies = [
-    "pico-ioc>=2.1.3",
+    "pico-ioc>=2.2.0",
     "redis>=5.0.0",
 ]
 
