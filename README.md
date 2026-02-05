@@ -4,7 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 ![CI (tox matrix)](https://github.com/dperezcabrera/pico-boot/actions/workflows/ci.yml/badge.svg)
 [![codecov](https://codecov.io/gh/dperezcabrera/pico-boot/branch/main/graph/badge.svg)](https://codecov.io/gh/dperezcabrera/pico-boot)
-[![Docs](https://img.shields.io/badge/Docs-pico--stack-blue?style=flat&logo=readthedocs&logoColor=white)](https://dperezcabrera.github.io/pico-boot/)
+[![Docs](https://img.shields.io/badge/Docs-pico--boot-blue?style=flat&logo=readthedocs&logoColor=white)](https://dperezcabrera.github.io/pico-boot/)
 
 **Zero-configuration bootstrap for the Pico ecosystem.**
 
