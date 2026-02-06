@@ -7,6 +7,7 @@ Tests cover:
 - Container functionality
 """
 
+import os
 import sys
 import pytest
 from types import ModuleType
@@ -14,6 +15,12 @@ from typing import Any, Optional, Tuple, Callable, Union
 from pico_ioc import component, provides, configured, PicoContainer
 from pico_ioc.factory import DeferredProvider, ProviderMetadata
 import pico_boot
+
+
+@pytest.fixture(autouse=True)
+def _disable_auto_plugins(monkeypatch):
+    """Isolate integration tests from entry-point plugins installed in the environment."""
+    monkeypatch.setenv("PICO_BOOT_AUTO_PLUGINS", "false")
 
 
 # --- Test fixtures: Sample components ---

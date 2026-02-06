@@ -5,14 +5,10 @@ from importlib.metadata import entry_points
 from types import ModuleType
 from typing import Any, Iterable, List, TYPE_CHECKING, Union
 
-KeyT = Union[str, type]
-
 if TYPE_CHECKING:
-    from typing import Dict, Optional, Tuple
     from pico_ioc import PicoContainer, ContextConfig
     from pico_ioc import init as init, ContainerObserver
 else:
-    from typing import Dict, Optional, Tuple
     import logging
     from pico_ioc import PicoContainer, ContextConfig
     from pico_ioc import init as _ioc_init, ContainerObserver
@@ -54,11 +50,7 @@ else:
         return scanners
 
     def _load_plugin_modules(group: str = "pico_boot.modules") -> List[ModuleType]:
-        eps = entry_points()
-        if hasattr(eps, "select"):
-            selected = eps.select(group=group)
-        else:  # legacy API
-            selected = [ep for ep in eps if ep.group == group]
+        selected = entry_points().select(group=group)
 
         seen: set[str] = set()
         modules: List[ModuleType] = []

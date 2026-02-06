@@ -312,6 +312,7 @@ Pico-Boot works with these integration packages:
 | [pico-sqlalchemy](https://github.com/dperezcabrera/pico-sqlalchemy) | SQLAlchemy integration |
 | [pico-celery](https://github.com/dperezcabrera/pico-celery) | Celery integration |
 | [pico-pydantic](https://github.com/dperezcabrera/pico-pydantic) | Pydantic validation |
+| [pico-agent](https://github.com/dperezcabrera/pico-agent) | LLM agent framework |
 
 ---
 
@@ -326,6 +327,20 @@ tox
 pip install -r docs/requirements.txt
 mkdocs serve
 ```
+
+---
+
+## Claude Code Skills
+
+This project includes pre-designed skills for [Claude Code](https://claude.ai/claude-code), enabling AI-assisted development with pico-boot patterns.
+
+| Skill | Command | Description |
+|-------|---------|-------------|
+| **Pico Boot Application** | `/pico-boot-app` | Configures applications with pico-boot auto-discovery |
+| **Pico Component Creator** | `/pico-component` | Creates components with DI, scopes and factories |
+| **Pico Test Generator** | `/pico-tests` | Generates tests for pico-framework components |
+
+See [Skills documentation](docs/skills.md) for full details and installation instructions.
 
 ---
 

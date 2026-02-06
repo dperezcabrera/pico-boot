@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.1] - 2026-02-06
+
+### Added
+- **Ecosystem**: Added `pico-agent` to ecosystem documentation (README table, architecture diagram, version compatibility).
+
+### Changed
+- **Simplified Plugin Loading**: Removed legacy `entry_points()` API fallback — now only uses `eps.select(group=group)`.
+- **Cleanup**: Removed unused `KeyT` type alias and redundant imports (`Dict`, `Optional`, `Tuple`).
+- **pyproject.toml**: Removed `async` optional dependency group.
+
+### Fixed
+- **Test Isolation**: Added `autouse` fixture to disable auto-plugins during integration tests via `PICO_BOOT_AUTO_PLUGINS=false`.
+
+---
+
 ## [0.1.0] - 2025-02-04
 
 ### Added

@@ -32,14 +32,14 @@ The Pico framework consists of multiple packages that work together seamlessly.
 │  FastAPI routes │ │  SQLAlchemy ORM │ │  Celery tasks   │
 │  & middleware   │ │  & sessions     │ │  & workers      │
 └─────────────────┘ └─────────────────┘ └─────────────────┘
-          │
-          ▼
-┌─────────────────┐
-│  pico-pydantic  │
-│                 │
-│   Validation    │
-│  interceptors   │
-└─────────────────┘
+          │                                       │
+          ▼                                       ▼
+┌─────────────────┐                     ┌─────────────────┐
+│  pico-pydantic  │                     │   pico-agent    │
+│                 │                     │                 │
+│   Validation    │                     │   LLM agents    │
+│  interceptors   │                     │   & tools       │
+└─────────────────┘                     └─────────────────┘
 ```
 
 ## Core Packages
@@ -195,6 +195,34 @@ class UserService:
         pass
 ```
 
+### pico-agent
+
+LLM agent framework with dependency injection.
+
+| | |
+|---|---|
+| **PyPI** | [pico-agent](https://pypi.org/project/pico-agent/) |
+| **Repository** | [github.com/dperezcabrera/pico-agent](https://github.com/dperezcabrera/pico-agent) |
+
+**Features:**
+- Declarative agent definitions with `@agent` and `@tool`
+- Multiple LLM backends (OpenAI, Gemini, LangChain)
+- Agent capabilities (memory, structured output, streaming)
+- Virtual and proxy agent patterns
+
+**Usage:**
+```python
+from pico_agent import agent, tool, AgentType
+
+@agent(type=AgentType.OPENAI)
+class AssistantAgent:
+    system_prompt = "You are a helpful assistant."
+
+@tool
+def search(query: str) -> str:
+    return f"Results for {query}"
+```
+
 ---
 
 ## Version Compatibility
@@ -206,6 +234,7 @@ class UserService:
 | pico-sqlalchemy | >= 2.0.0 | 3.11+ |
 | pico-celery | >= 2.0.0 | 3.11+ |
 | pico-pydantic | >= 2.0.0 | 3.11+ |
+| pico-agent | >= 2.0.0 | 3.11+ |
 
 ---
 
