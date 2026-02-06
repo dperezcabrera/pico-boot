@@ -60,7 +60,7 @@ where = ["src"]
 include = ["pico_boot*"]
 
 [tool.setuptools_scm]
-version_scheme = "guess-next-dev"
+version_scheme = "post-release"
 local_scheme = "no-local-version"
 fallback_version = "0.1.0"
 write_to = "src/pico_boot/_version.py"

@@ -1,9 +1,13 @@
 # Pico-Boot
 
 [![PyPI](https://img.shields.io/pypi/v/pico-boot.svg)](https://pypi.org/project/pico-boot/)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/dperezcabrera/pico-boot)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 ![CI (tox matrix)](https://github.com/dperezcabrera/pico-boot/actions/workflows/ci.yml/badge.svg)
 [![codecov](https://codecov.io/gh/dperezcabrera/pico-boot/branch/main/graph/badge.svg)](https://codecov.io/gh/dperezcabrera/pico-boot)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=dperezcabrera_pico-boot&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=dperezcabrera_pico-boot)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=dperezcabrera_pico-boot&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=dperezcabrera_pico-boot)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=dperezcabrera_pico-boot&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=dperezcabrera_pico-boot)
 [![Docs](https://img.shields.io/badge/Docs-pico--boot-blue?style=flat&logo=readthedocs&logoColor=white)](https://dperezcabrera.github.io/pico-boot/)
 
 **Zero-configuration bootstrap for the Pico ecosystem.**
