@@ -9,9 +9,11 @@ Tests cover:
 """
 
 import os
-import pytest
 from types import ModuleType
-from unittest.mock import MagicMock, patch, call
+from unittest.mock import MagicMock, call, patch
+
+import pytest
+
 import pico_boot
 
 
@@ -435,6 +437,7 @@ class TestInitSignature:
     def test_has_same_signature_as_pico_ioc_init(self):
         """init() should have the same signature as pico_ioc.init()."""
         import inspect
+
         from pico_ioc import init as ioc_init
 
         pico_boot_sig = inspect.signature(pico_boot.init)

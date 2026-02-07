@@ -7,9 +7,11 @@ Tests cover:
 - _normalize_modules: Deduplicating and normalizing module lists
 """
 
-import pytest
 from types import ModuleType
 from unittest.mock import MagicMock, patch
+
+import pytest
+
 import pico_boot
 
 
@@ -24,6 +26,7 @@ class TestToModuleList:
     def test_single_module_becomes_list(self):
         """A single module object should become a one-element list."""
         import sys
+
         result = pico_boot._to_module_list(sys)
         assert result == [sys]
 
@@ -41,6 +44,7 @@ class TestToModuleList:
 
     def test_generator_becomes_list(self):
         """A generator should become a list."""
+
         def gen():
             yield "app1"
             yield "app2"
@@ -65,6 +69,7 @@ class TestImportModuleLike:
     def test_module_returns_itself(self):
         """A module object should return itself."""
         import sys
+
         result = pico_boot._import_module_like(sys)
         assert result is sys
 
@@ -72,26 +77,32 @@ class TestImportModuleLike:
         """A string module name should import the module."""
         result = pico_boot._import_module_like("os")
         import os
+
         assert result is os
 
     def test_string_imports_submodule(self):
         """A dotted string should import the submodule."""
         result = pico_boot._import_module_like("os.path")
         import os.path
+
         assert result is os.path
 
     def test_class_imports_its_module(self):
         """A class should import its containing module."""
         from collections import OrderedDict
+
         result = pico_boot._import_module_like(OrderedDict)
         import collections
+
         assert result is collections
 
     def test_function_imports_its_module(self):
         """A function should import its containing module."""
         from os.path import join
+
         result = pico_boot._import_module_like(join)
         import os.path
+
         # Note: posixpath or ntpath depending on OS
         assert result.__name__ in ("posixpath", "ntpath", "os.path")
 
@@ -115,11 +126,13 @@ class TestNormalizeModules:
         result = pico_boot._normalize_modules(["os", "os", "os"])
         assert len(result) == 1
         import os
+
         assert result[0] is os
 
     def test_deduplicates_mixed_inputs(self):
         """Same module from different input types should be deduplicated."""
         import sys
+
         result = pico_boot._normalize_modules(["sys", sys, "sys"])
         assert len(result) == 1
         assert result[0] is sys

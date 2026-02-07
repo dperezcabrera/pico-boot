@@ -7,9 +7,11 @@ Tests cover:
 - Filtering of core modules (pico_ioc, pico_boot)
 """
 
-import pytest
 from types import ModuleType
-from unittest.mock import MagicMock, patch, PropertyMock
+from unittest.mock import MagicMock, PropertyMock, patch
+
+import pytest
+
 import pico_boot
 
 

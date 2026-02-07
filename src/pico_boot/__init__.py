@@ -3,15 +3,16 @@ import os
 from importlib import import_module
 from importlib.metadata import entry_points
 from types import ModuleType
-from typing import Any, Iterable, List, TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Any, Iterable, List, Union
 
 if TYPE_CHECKING:
-    from pico_ioc import PicoContainer, ContextConfig
-    from pico_ioc import init as init, ContainerObserver
+    from pico_ioc import ContainerObserver, ContextConfig, PicoContainer
+    from pico_ioc import init as init
 else:
     import logging
-    from pico_ioc import PicoContainer, ContextConfig
-    from pico_ioc import init as _ioc_init, ContainerObserver
+
+    from pico_ioc import ContainerObserver, ContextConfig, PicoContainer
+    from pico_ioc import init as _ioc_init
 
     logger = logging.getLogger(__name__)
 
@@ -110,4 +111,3 @@ __all__ = [
     "ContextConfig",
     "ContainerObserver",
 ]
-

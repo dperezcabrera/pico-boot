@@ -9,11 +9,13 @@ Tests cover:
 
 import os
 import sys
-import pytest
 from types import ModuleType
-from typing import Any, Optional, Tuple, Callable, Union
-from pico_ioc import component, provides, configured, PicoContainer
+from typing import Any, Callable, Optional, Tuple, Union
+
+import pytest
+from pico_ioc import PicoContainer, component, configured, provides
 from pico_ioc.factory import DeferredProvider, ProviderMetadata
+
 import pico_boot
 
 
@@ -24,6 +26,7 @@ def _disable_auto_plugins(monkeypatch):
 
 
 # --- Test fixtures: Sample components ---
+
 
 @component
 class SampleService:
@@ -192,10 +195,7 @@ class TestOverrides:
                 return "Mocked!"
 
         mock = MockService()
-        container = pico_boot.init(
-            modules=[__name__],
-            overrides={SampleService: mock}
-        )
+        container = pico_boot.init(modules=[__name__], overrides={SampleService: mock})
 
         try:
             service = container.get(SampleService)
@@ -212,10 +212,7 @@ class TestOverrides:
                 return "MOCK"
 
         mock = MockService()
-        container = pico_boot.init(
-            modules=[__name__],
-            overrides={SampleService: mock}
-        )
+        container = pico_boot.init(modules=[__name__], overrides={SampleService: mock})
 
         try:
             dependent = container.get(DependentService)
@@ -226,6 +223,7 @@ class TestOverrides:
 
 # --- Fixtures for scanner harvesting integration ---
 
+
 class PlainService:
     """Not decorated — only discoverable via custom scanner."""
 
@@ -234,6 +232,7 @@ class PlainService:
 
 
 KeyT = Union[str, type]
+
 
 class _TestScanner:
     """A real CustomScanner that discovers PlainService."""
@@ -246,10 +245,18 @@ class _TestScanner:
             return None
         provider = DeferredProvider(lambda pico, loc, c=obj: c())
         md = ProviderMetadata(
-            key=obj, provided_type=obj, concrete_class=obj,
-            factory_class=None, factory_method=None, qualifiers=set(),
-            primary=True, lazy=False, infra="custom", pico_name=None,
-            scope="singleton", dependencies=(),
+            key=obj,
+            provided_type=obj,
+            concrete_class=obj,
+            factory_class=None,
+            factory_method=None,
+            qualifiers=set(),
+            primary=True,
+            lazy=False,
+            infra="custom",
+            pico_name=None,
+            scope="singleton",
+            dependencies=(),
         )
         return (obj, provider, md)
 
@@ -328,10 +335,18 @@ class TestScannerHarvestingIntegration:
                     return None
                 provider = DeferredProvider(lambda pico, loc, c=obj: c())
                 md = ProviderMetadata(
-                    key=obj, provided_type=obj, concrete_class=obj,
-                    factory_class=None, factory_method=None, qualifiers=set(),
-                    primary=True, lazy=False, infra="custom", pico_name=None,
-                    scope="singleton", dependencies=(),
+                    key=obj,
+                    provided_type=obj,
+                    concrete_class=obj,
+                    factory_class=None,
+                    factory_method=None,
+                    qualifiers=set(),
+                    primary=True,
+                    lazy=False,
+                    infra="custom",
+                    pico_name=None,
+                    scope="singleton",
+                    dependencies=(),
                 )
                 return (obj, provider, md)
 

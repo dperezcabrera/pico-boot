@@ -2,11 +2,13 @@
 Pytest configuration and shared fixtures for pico-boot tests.
 """
 
+import os
 import sys
-import pytest
+from importlib.metadata import EntryPoint
 from types import ModuleType
 from unittest.mock import MagicMock, patch
-from importlib.metadata import EntryPoint
+
+import pytest
 
 
 @pytest.fixture
@@ -68,6 +70,3 @@ def clean_env():
             os.environ[var] = value
         elif var in os.environ:
             del os.environ[var]
-
-
-import os

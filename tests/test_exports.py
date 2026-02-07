@@ -8,6 +8,7 @@ Tests cover:
 """
 
 import pytest
+
 import pico_boot
 
 
@@ -49,16 +50,19 @@ class TestReexportedTypes:
     def test_pico_container_is_same_as_ioc(self):
         """PicoContainer should be the same class as pico_ioc.PicoContainer."""
         from pico_ioc import PicoContainer as IocContainer
+
         assert pico_boot.PicoContainer is IocContainer
 
     def test_context_config_is_same_as_ioc(self):
         """ContextConfig should be the same as pico_ioc.ContextConfig."""
         from pico_ioc import ContextConfig as IocConfig
+
         assert pico_boot.ContextConfig is IocConfig
 
     def test_container_observer_is_same_as_ioc(self):
         """ContainerObserver should be the same as pico_ioc.ContainerObserver."""
         from pico_ioc import ContainerObserver as IocObserver
+
         assert pico_boot.ContainerObserver is IocObserver
 
 
@@ -75,7 +79,6 @@ class TestInternalFunctions:
 
     def test_internal_functions_not_in_all(self):
         """Internal functions should not be in __all__."""
-        internal = ["_to_module_list", "_import_module_like",
-                    "_normalize_modules", "_load_plugin_modules"]
+        internal = ["_to_module_list", "_import_module_like", "_normalize_modules", "_load_plugin_modules"]
         for name in internal:
             assert name not in pico_boot.__all__
