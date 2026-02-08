@@ -336,15 +336,21 @@ mkdocs serve
 
 ## Claude Code Skills
 
-This project includes pre-designed skills for [Claude Code](https://claude.ai/claude-code), enabling AI-assisted development with pico-boot patterns.
+Install [Claude Code](https://code.claude.com) skills for AI-assisted development with pico-boot:
 
-| Skill | Command | Description |
-|-------|---------|-------------|
-| **Pico Boot Application** | `/pico-boot-app` | Configures applications with pico-boot auto-discovery |
-| **Pico Component Creator** | `/pico-component` | Creates components with DI, scopes and factories |
-| **Pico Test Generator** | `/pico-tests` | Generates tests for pico-framework components |
+```bash
+curl -sL https://raw.githubusercontent.com/dperezcabrera/pico-skills/main/install.sh | bash -s -- boot
+```
 
-See [Skills documentation](docs/skills.md) for full details and installation instructions.
+| Command | Description |
+|---------|-------------|
+| `/add-app` | Scaffold a new pico-boot application |
+| `/add-component` | Add components, factories, interceptors, settings |
+| `/add-tests` | Generate tests for pico-framework components |
+
+All skills: `curl -sL https://raw.githubusercontent.com/dperezcabrera/pico-skills/main/install.sh | bash`
+
+See [pico-skills](https://github.com/dperezcabrera/pico-skills) for details.
 
 ---
 
