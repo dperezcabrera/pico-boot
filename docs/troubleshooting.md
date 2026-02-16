@@ -203,20 +203,24 @@ pico_ioc.exceptions.CircularDependencyError: Circular dependency detected: A -> 
 
 **Solutions:**
 
-1. **Use lazy injection:**
+1. **Use `lazy=True` on one of the components:**
    ```python
-   from pico_ioc import Lazy
-
-   @component
+   @component(lazy=True)
    class ServiceA:
-       def __init__(self, b: Lazy[ServiceB]):
-           self._b = b
-
-       def use_b(self):
-           return self._b().do_something()
+       def __init__(self, b: ServiceB):
+           self.b = b
    ```
 
-2. **Restructure dependencies:**
+2. **Use `@configure` to break the cycle:**
+   ```python
+   @component
+   class ServiceA:
+       @configure
+       def setup(self, b: ServiceB):
+           self.b = b
+   ```
+
+3. **Restructure dependencies:**
    - Extract common functionality to a third service
    - Use events instead of direct dependencies
 

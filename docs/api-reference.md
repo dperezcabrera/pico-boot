@@ -186,10 +186,8 @@ Log messages:
 ## Type Hints
 
 ```python
-from typing import Any, Iterable, List, Union
+from typing import Any, Iterable, Union
 from types import ModuleType
-
-KeyT = Union[str, type]
 
 def init(
     modules: Union[Any, Iterable[Any]],

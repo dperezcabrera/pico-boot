@@ -296,8 +296,7 @@ Mock these for unit tests:
 
 ### Potential Enhancements
 
-1. **Config file discovery** - auto-load `application.yaml`
-2. **Profile support** - environment-based profile activation
+1. **Profile support** - environment-based profile activation (e.g., `PICO_BOOT_PROFILES`)
 
 ### Non-Goals
 
