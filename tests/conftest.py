@@ -10,6 +10,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+import pico_boot
+
 
 @pytest.fixture
 def mock_module():
@@ -70,3 +72,19 @@ def clean_env():
             os.environ[var] = value
         elif var in os.environ:
             del os.environ[var]
+
+
+@pytest.fixture
+def pico_container():
+    """Create a container and ensure shutdown after test."""
+    containers = []
+
+    def _init(**kwargs):
+        c = pico_boot.init(**kwargs)
+        containers.append(c)
+        return c
+
+    yield _init
+
+    for c in containers:
+        c.shutdown()

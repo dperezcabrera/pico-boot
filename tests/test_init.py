@@ -102,39 +102,10 @@ class TestInitWithAutoPlugins:
 
                 mock_load.assert_called_once()
 
-    def test_auto_plugins_disabled_with_false(self):
-        """Auto-discovery should be disabled when PICO_BOOT_AUTO_PLUGINS=false."""
-        os.environ["PICO_BOOT_AUTO_PLUGINS"] = "false"
-
-        try:
-            with patch("pico_boot._ioc_init") as mock_ioc_init:
-                with patch("pico_boot._load_plugin_modules") as mock_load:
-                    mock_ioc_init.return_value = MagicMock()
-
-                    pico_boot.init(modules=["os"])
-
-                    mock_load.assert_not_called()
-        finally:
-            del os.environ["PICO_BOOT_AUTO_PLUGINS"]
-
-    def test_auto_plugins_disabled_with_zero(self):
-        """Auto-discovery should be disabled when PICO_BOOT_AUTO_PLUGINS=0."""
-        os.environ["PICO_BOOT_AUTO_PLUGINS"] = "0"
-
-        try:
-            with patch("pico_boot._ioc_init") as mock_ioc_init:
-                with patch("pico_boot._load_plugin_modules") as mock_load:
-                    mock_ioc_init.return_value = MagicMock()
-
-                    pico_boot.init(modules=["os"])
-
-                    mock_load.assert_not_called()
-        finally:
-            del os.environ["PICO_BOOT_AUTO_PLUGINS"]
-
-    def test_auto_plugins_disabled_with_no(self):
-        """Auto-discovery should be disabled when PICO_BOOT_AUTO_PLUGINS=no."""
-        os.environ["PICO_BOOT_AUTO_PLUGINS"] = "no"
+    @pytest.mark.parametrize("value", ["false", "0", "no"])
+    def test_auto_plugins_disabled(self, value):
+        """Auto-discovery should be disabled when PICO_BOOT_AUTO_PLUGINS is falsy."""
+        os.environ["PICO_BOOT_AUTO_PLUGINS"] = value
 
         try:
             with patch("pico_boot._ioc_init") as mock_ioc_init:
