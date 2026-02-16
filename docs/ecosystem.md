@@ -229,12 +229,12 @@ def search(query: str) -> str:
 
 | Package | pico-ioc Version | Python |
 |---------|------------------|--------|
-| pico-boot | >= 2.1.0 | 3.11+ |
-| pico-fastapi | >= 2.0.0 | 3.11+ |
-| pico-sqlalchemy | >= 2.0.0 | 3.11+ |
-| pico-celery | >= 2.0.0 | 3.11+ |
-| pico-pydantic | >= 2.0.0 | 3.11+ |
-| pico-agent | >= 2.0.0 | 3.11+ |
+| pico-boot | >= 2.2.0 | 3.11+ |
+| pico-fastapi | >= 2.2.0 | 3.11+ |
+| pico-sqlalchemy | >= 2.2.0 | 3.11+ |
+| pico-celery | >= 2.2.0 | 3.11+ |
+| pico-pydantic | >= 2.2.0 | 3.11+ |
+| pico-agent | >= 2.2.0 | 3.11+ |
 
 ---
 
