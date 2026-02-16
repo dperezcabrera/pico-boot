@@ -266,7 +266,106 @@ container = init(
 
 ---
 
-## Troubleshooting
+## Troubleshooting -- Error Message Reference
+
+This section lists every error and warning that pico-boot can emit, with
+exact text, root cause, and fix.
+
+---
+
+### `ImportError: Cannot determine module for object <repr>`
+
+**Exact text:**
+```
+ImportError: Cannot determine module for object <repr>
+```
+
+**Source:** `_import_module_like()` in `src/pico_boot/__init__.py`.
+
+**Cause:** An item in the *modules* list is not a string, not a
+`ModuleType`, and does not have a `__module__` or `__name__` attribute.
+For example, passing a plain `object()` or `None`.
+
+**Fix:** Only pass module names (strings), imported module objects, or
+classes/functions whose owning module can be determined:
+
+```python
+# Good
+container = init(modules=["myapp.services"])
+
+# Bad -- plain object has no __module__
+container = init(modules=[object()])
+```
+
+---
+
+### `WARNING: Failed to load pico-boot plugin entry point '<name>' (<module>): <exception>`
+
+**Exact text (log format):**
+```
+WARNING:pico_boot:Failed to load pico-boot plugin entry point '<name>' (<module>): <exception>
+```
+
+**Source:** `_load_plugin_modules()` in `src/pico_boot/__init__.py`.
+
+**Cause:** An auto-discovered plugin entry point could not be imported.
+Common underlying exceptions include:
+
+| Underlying Exception | Typical Reason |
+|----------------------|----------------|
+| `ModuleNotFoundError` | A dependency of the plugin is not installed. |
+| `SyntaxError` | The plugin module has a syntax error. |
+| `ImportError` | The module path in the entry point is wrong. |
+| Any other `Exception` | The plugin raises at import time. |
+
+**Fix:**
+
+1. Check that the plugin and all its dependencies are installed:
+   ```bash
+   pip show my-plugin
+   pip install my-plugin
+   ```
+2. Verify the module is importable:
+   ```bash
+   python -c "import my_plugin"
+   ```
+3. Fix any syntax or import-time errors in the plugin source.
+4. If the plugin is optional and not needed, you can ignore the warning
+   or uninstall the package.
+
+---
+
+### `ModuleNotFoundError: No module named '<name>'`
+
+**Cause:** A module name passed to *modules* does not exist in
+`sys.path`, or a plugin entry point references a non-existent module.
+
+**Fix:**
+```bash
+# Verify the module is importable
+python -c "import myapp.services"
+
+# Install the package if missing
+pip install -e .
+```
+
+---
+
+### `TypeError` on `init()` call
+
+**Cause:** Missing or unexpected arguments.  `pico_boot.init()` mirrors
+the signature of `pico_ioc.init()`.  A `TypeError` usually means a
+required keyword was omitted or an unknown keyword was passed.
+
+**Fix:** Check the `pico_ioc.init()` signature and ensure all required
+parameters are provided:
+
+```python
+# modules is the only required argument
+container = init(modules=["myapp"])
+```
+
+---
 
 ### "Module not found" errors
 
@@ -279,16 +378,16 @@ python -c "import mymodule"
 
 ### "Component not found" errors
 
-1. Check that the module with the component is in the modules list
-2. Check that the component has a decorator (`@component`, `@provides`, etc.)
-3. Check that auto-discovery didn't fail (enable debug logging)
+1. Check that the module with the component is in the modules list.
+2. Check that the component has a decorator (`@component`, `@provides`, etc.).
+3. Check that auto-discovery did not fail (enable debug logging).
 
 ### Container returns wrong instance
 
 Check for:
-1. Multiple containers (each `init()` creates a new container)
-2. Scope issues (prototype vs singleton)
-3. Overrides that you forgot about
+1. Multiple containers (each `init()` creates a new container).
+2. Scope issues (prototype vs singleton).
+3. Overrides that you forgot about.
 
 ### Performance is slow at startup
 

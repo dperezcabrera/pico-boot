@@ -11,45 +11,29 @@ Pico-Boot is intentionally minimal. It's a thin wrapper around `pico_ioc.init()`
 3. **Scanner harvesting** from loaded modules (`PICO_SCANNERS`)
 4. **Environment-based control** via `PICO_BOOT_AUTO_PLUGINS`
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        Your Application                          │
-│                                                                  │
-│  from pico_boot import init                                      │
-│  container = init(modules=["myapp"])                             │
-│                                                                  │
-└─────────────────────────────┬────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                          pico-boot                               │
-│                                                                  │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────────┐  │
-│  │   Module    │  │   Plugin    │  │      Scanner            │  │
-│  │ Normalizer  │  │  Discovery  │  │     Harvesting          │  │
-│  └──────┬──────┘  └──────┬──────┘  └───────────┬─────────────┘  │
-│         │                │                     │                 │
-│         └────────────────┼─────────────────────┘                 │
-│                          │                                       │
-│                          ▼                                       │
-│            ┌──────────────────────────┐                          │
-│            │  Merged Modules +        │                          │
-│            │  Harvested Scanners      │                          │
-│            └─────────────┬────────────┘                          │
-│                          │                                       │
-└──────────────────────────┼───────────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                          pico-ioc                                │
-│                                                                  │
-│                     pico_ioc.init()                              │
-│                                                                  │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────────────┐ │
-│  │ Scanner  │  │ Container│  │  Scopes  │  │   Configuration  │ │
-│  └──────────┘  └──────────┘  └──────────┘  └──────────────────┘ │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+graph TD
+    APP["Your Application<br/><code>from pico_boot import init</code><br/><code>container = init(modules=[&quot;myapp&quot;])</code>"]
+    APP --> BOOT
+
+    subgraph BOOT["pico-boot"]
+        MN["Module Normalizer"]
+        PD["Plugin Discovery<br/>(entry points)"]
+        SH["Scanner Harvesting<br/>(PICO_SCANNERS)"]
+        MN --> MERGE
+        PD --> MERGE
+        SH --> MERGE
+        MERGE["Merged Modules +<br/>Harvested Scanners"]
+    end
+
+    MERGE --> IOC
+
+    subgraph IOC["pico-ioc"]
+        SCANNER["Scanner"]
+        CONTAINER["Container"]
+        SCOPES["Scopes"]
+        CONFIG["Configuration"]
+    end
 ```
 
 ## Component Breakdown
@@ -68,34 +52,22 @@ init(modules="myapp")                      # Single string (converted to list)
 
 **Implementation:**
 
-```
-_to_module_list(input)
-       │
-       ▼
-_import_module_like(item) for each item
-       │
-       ▼
-_normalize_modules(modules) - deduplicate by __name__
+```mermaid
+flowchart TD
+    A["_to_module_list(input)"] --> B["_import_module_like(item)<br/>for each item"]
+    B --> C["_normalize_modules(modules)<br/>deduplicate by __name__"]
 ```
 
 ### 2. Plugin Discovery
 
 Plugin discovery uses Python's `importlib.metadata.entry_points()`:
 
-```
-entry_points(group="pico_boot.modules")
-       │
-       ▼
-Filter out: pico_ioc, pico_boot
-       │
-       ▼
-import_module(ep.module) for each
-       │
-       ▼
-Deduplicate by module name
-       │
-       ▼
-List[ModuleType]
+```mermaid
+flowchart TD
+    A["entry_points(group=&quot;pico_boot.modules&quot;)"] --> B["Filter out pico_ioc, pico_boot"]
+    B --> C["import_module(ep.module) for each"]
+    C --> D["Deduplicate by module name"]
+    D --> E["List[ModuleType]"]
 ```
 
 **Why filter pico_ioc and pico_boot?**
@@ -106,13 +78,11 @@ These are infrastructure packages, not application modules. They don't contain c
 
 A single environment variable controls plugin auto-discovery:
 
-```
-PICO_BOOT_AUTO_PLUGINS
-       │
-       ▼
-"true" (default) ──────► Enable discovery
-       │
-"false", "0", "no" ────► Disable discovery
+```mermaid
+flowchart TD
+    ENV["PICO_BOOT_AUTO_PLUGINS"]
+    ENV -->|"&quot;true&quot; (default)"| ON["Enable discovery"]
+    ENV -->|"&quot;false&quot; / &quot;0&quot; / &quot;no&quot;"| OFF["Disable discovery"]
 ```
 
 ## Code Flow
@@ -291,6 +261,58 @@ Mock these for unit tests:
 - `entry_points()` - avoid depending on installed packages
 - `import_module()` - avoid importing real modules
 - `logger` - verify warning messages
+
+## Auto-Discovery Flow
+
+The following diagram shows the complete auto-discovery lifecycle from
+installed packages to a fully initialised container:
+
+```mermaid
+flowchart TD
+    START(["pico_boot.init() called"]) --> BIND["Bind args to pico_ioc.init signature"]
+    BIND --> NORM["Normalise user modules<br/>(_to_module_list + _normalize_modules)"]
+    NORM --> CHECK{"PICO_BOOT_AUTO_PLUGINS<br/>enabled?"}
+    CHECK -->|Yes| EP["Read entry_points<br/>(group=&quot;pico_boot.modules&quot;)"]
+    CHECK -->|No| SKIP["Use only user modules"]
+    EP --> FILTER["Filter out pico_ioc, pico_boot"]
+    FILTER --> IMPORT["Import each plugin module"]
+    IMPORT --> DEDUP["Deduplicate all modules<br/>(user + plugins)"]
+    DEDUP --> HARVEST["Harvest PICO_SCANNERS<br/>from all modules"]
+    SKIP --> HARVEST
+    HARVEST --> MERGE["Merge harvested scanners<br/>with custom_scanners arg"]
+    MERGE --> DELEGATE["Delegate to pico_ioc.init()"]
+    DELEGATE --> CONTAINER(["PicoContainer returned"])
+```
+
+## Comparison: pico_boot.init() vs pico_ioc.init()
+
+```mermaid
+flowchart LR
+    subgraph PIOC["pico_ioc.init()"]
+        direction TB
+        A1["Receive modules, config,<br/>profiles, overrides, scanners"]
+        A2["Scan modules for<br/>@component, @provides, etc."]
+        A3["Build container"]
+        A1 --> A2 --> A3
+    end
+
+    subgraph PBOOT["pico_boot.init()"]
+        direction TB
+        B1["Receive same args as pico_ioc.init()"]
+        B2["Normalise & deduplicate modules"]
+        B3["Auto-discover plugins<br/>(entry points)"]
+        B4["Harvest PICO_SCANNERS"]
+        B5["Delegate to pico_ioc.init()"]
+        B1 --> B2 --> B3 --> B4 --> B5
+    end
+
+    PBOOT -->|"enriched args"| PIOC
+```
+
+The key difference is that `pico_boot.init()` performs three additional
+pre-processing steps (normalisation, plugin discovery, scanner harvesting)
+before forwarding all arguments to `pico_ioc.init()`.  The returned
+`PicoContainer` is identical in both cases.
 
 ## Future Considerations
 
