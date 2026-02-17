@@ -209,3 +209,9 @@ Version is managed by `setuptools-scm` from git tags.
 from pico_boot._version import __version__
 print(__version__)
 ```
+
+---
+
+## Auto-generated API
+
+::: pico_boot
