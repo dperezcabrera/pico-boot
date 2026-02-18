@@ -1,6 +1,6 @@
-# Claude Code Skills
+# AI Coding Skills
 
-[Claude Code](https://claude.ai/code) skills for AI-assisted development with pico-boot and the pico-framework ecosystem.
+[Claude Code](https://code.claude.com) and [OpenAI Codex](https://openai.com/index/introducing-codex/) skills for AI-assisted development with pico-boot and the pico-framework ecosystem.
 
 ## Installation
 
@@ -14,6 +14,16 @@ Or install all pico-framework skills (ioc, boot, fastapi, sqlalchemy, celery, py
 
 ```bash
 curl -sL https://raw.githubusercontent.com/dperezcabrera/pico-skills/main/install.sh | bash
+```
+
+### Platform-specific
+
+```bash
+# Claude Code only
+curl -sL https://raw.githubusercontent.com/dperezcabrera/pico-skills/main/install.sh | bash -s -- --claude boot
+
+# OpenAI Codex only
+curl -sL https://raw.githubusercontent.com/dperezcabrera/pico-skills/main/install.sh | bash -s -- --codex boot
 ```
 
 ## Available Commands
