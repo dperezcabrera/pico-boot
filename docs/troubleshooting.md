@@ -1,482 +1,489 @@
 # Troubleshooting
 
-This guide covers common issues and their solutions when using pico-boot.
+This is the unified troubleshooting guide for the Pico ecosystem.
+Start from the symptom, follow the decision tree, arrive at the fix.
 
-## Plugin Discovery Issues
-
-### Plugin Not Being Discovered
-
-**Symptoms:**
-- Plugin components are not available in the container
-- No error messages, plugin is silently ignored
-
-**Diagnosis:**
-
-1. **Check entry point group name:**
-   ```toml
-   # Must be exactly this:
-   [project.entry-points."pico_boot.modules"]
-   my_plugin = "my_plugin"
-   ```
-
-2. **Verify entry point is registered:**
-   ```bash
-   python -c "from importlib.metadata import entry_points; print([ep for ep in entry_points(group='pico_boot.modules')])"
-   ```
-
-3. **Check if package is installed:**
-   ```bash
-   pip show my-plugin
-   ```
-
-4. **Check if editable install is needed:**
-   ```bash
-   pip install -e ./my-plugin
-   ```
-
-**Solutions:**
-
-- Fix the entry point group name (must be `pico_boot.modules`)
-- Reinstall the package after changing `pyproject.toml`
-- Use editable install during development
+It covers **pico-ioc**, **pico-boot**, **pico-fastapi**, and **pico-pydantic**.
 
 ---
 
-### Plugin Import Fails Silently
+## "My component is not found"
 
-**Symptoms:**
-- Plugin is registered but components aren't available
-- No visible error
+```
+pico_ioc.exceptions.ProviderNotFoundError: No provider registered for type 'MyService'
+```
 
-**Diagnosis:**
+Follow this checklist **in order** — stop at the first match:
 
-Enable debug logging:
+### 1. Is the class decorated?
+
+Every class the container manages needs a decorator.
+
+```python
+from pico_ioc import component
+
+@component          # <-- required
+class MyService:
+    pass
+```
+
+If the class is a third-party type you cannot decorate, use `@provides`:
+
+```python
+from pico_ioc import provides
+import redis
+
+@provides(redis.Redis)
+def create_redis(config: RedisConfig) -> redis.Redis:
+    return redis.Redis(host=config.host)
+```
+
+### 2. Is the module in the `modules` list?
+
+pico-boot only scans modules you tell it about. If `MyService` lives in
+`myapp/services/user.py`, that module must be reachable:
+
+```python
+from pico_boot import init
+
+container = init(modules=[
+    "myapp.services.user",   # exact module
+    # or
+    "myapp.services",        # package __init__.py that re-exports
+])
+```
+
+> **Tip:** `init(modules=["myapp.services"])` scans `myapp/services/__init__.py`,
+> not every file in the directory. Either re-export from `__init__.py` or list
+> each submodule explicitly.
+
+### 3. Can Python import the module?
+
+```bash
+python -c "import myapp.services.user"
+```
+
+If this fails, the container never sees your components. Common causes:
+
+| Error | Fix |
+|-------|-----|
+| `ModuleNotFoundError` | `pip install -e .` or fix `PYTHONPATH` |
+| `SyntaxError` | Fix the syntax error in the module |
+| `ImportError` (circular) | Use `TYPE_CHECKING` guard (see below) |
+
+### 4. Is a profile required?
+
+```python
+@component(profiles=["production"])
+class MyService:
+    pass
+```
+
+This component only exists when the profile is active:
+
+```python
+container = init(modules=["myapp"], profiles=["production"])
+```
+
+### 5. Is there a qualifier mismatch?
+
+```python
+from typing import Annotated
+from pico_ioc import Qualifier
+
+# Registered with qualifier
+@component(qualifier="fast")
+class FastCache: ...
+
+# Consumer must use the same qualifier
+@component
+class MyService:
+    def __init__(self, cache: Annotated[Cache, Qualifier("fast")]):
+        self.cache = cache
+```
+
+If the consumer asks for `Cache` without the qualifier, the container won't
+match `FastCache`.
+
+### 6. Is auto-discovery disabled?
+
+If you use pico-boot plugins (pico-fastapi, pico-pydantic, etc.) and they
+are not loading:
+
+```bash
+echo $PICO_BOOT_AUTO_PLUGINS
+# If "false", plugins are skipped
+unset PICO_BOOT_AUTO_PLUGINS
+```
+
+### 7. Did the plugin entry point fail silently?
+
+Enable debug logging to see warnings:
 
 ```python
 import logging
-logging.basicConfig(level=logging.DEBUG)
 logging.getLogger("pico_boot").setLevel(logging.DEBUG)
 
 from pico_boot import init
 container = init(modules=["myapp"])
 ```
 
-Look for warnings like:
+Look for:
+
 ```
-WARNING:pico_boot:Failed to load pico-boot plugin entry point 'my_plugin' (my_plugin): ...
+WARNING:pico_boot:Failed to load pico-boot plugin entry point 'my_plugin' ...
 ```
 
-**Common causes:**
+This means the plugin is registered but its module fails to import.
+Fix the underlying `ModuleNotFoundError` or `SyntaxError`.
 
-1. **Missing dependency:**
-   ```
-   ModuleNotFoundError: No module named 'some_dependency'
-   ```
-   Solution: Add missing dependency to plugin's `pyproject.toml`
+### 8. Is the entry point registered correctly?
 
-2. **Syntax error in plugin:**
-   ```
-   SyntaxError: invalid syntax
-   ```
-   Solution: Fix the syntax error in the plugin module
+For plugins that expose components via entry points:
 
-3. **Import-time exception:**
-   ```
-   Exception: Something failed during import
-   ```
-   Solution: Wrap problematic code in functions, not module-level
+```toml
+# pyproject.toml — must be exactly this group name
+[project.entry-points."pico_boot.modules"]
+my_plugin = "my_plugin"
+```
 
----
-
-### Auto-Discovery Disabled Unexpectedly
-
-**Symptoms:**
-- Plugins not loaded even though they're installed
-
-**Diagnosis:**
+Verify the entry point exists:
 
 ```bash
-echo $PICO_BOOT_AUTO_PLUGINS
+python -c "
+from importlib.metadata import entry_points
+eps = entry_points(group='pico_boot.modules')
+for ep in eps:
+    print(f'{ep.name} -> {ep.value}')
+"
 ```
 
-**Solution:**
-
-Unset or set to "true":
+If empty, reinstall the package:
 
 ```bash
-unset PICO_BOOT_AUTO_PLUGINS
-# or
-export PICO_BOOT_AUTO_PLUGINS=true
+pip install -e ./my-plugin
 ```
 
 ---
 
-## Container Issues
+## "My controller is not registered" (pico-fastapi)
 
-### "Component not found" Error
+Routes exist but return 404 for all paths.
 
-**Symptoms:**
+### 1. Is the class decorated with `@controller`?
+
+```python
+from pico_fastapi import controller, get
+
+@controller(prefix="/api")    # <-- required
+class UserController:
+    @get("/users")
+    async def list_users(self):
+        ...
 ```
-pico_ioc.exceptions.ComponentNotFoundError: No component registered for type 'MyService'
+
+`@controller` registers the class as a `@component` and marks it for
+route scanning. Without it, pico-fastapi ignores the class.
+
+### 2. Is the controller module in the `modules` list?
+
+```python
+container = init(modules=[
+    "myapp.controllers",   # must include the controller module
+    "myapp.services",
+])
 ```
 
-**Diagnosis checklist:**
+### 3. Is pico-fastapi itself loaded?
 
-1. **Is the module in the modules list?**
-   ```python
-   container = init(modules=["myapp.services"])  # Include the right module
-   ```
+If you use `pico-boot`, pico-fastapi is auto-discovered. If auto-discovery
+is disabled, add the pico-fastapi modules explicitly:
 
-2. **Does the class have a decorator?**
-   ```python
-   @component  # Required!
-   class MyService:
-       pass
-   ```
+```python
+container = init(modules=[
+    "myapp",
+    "pico_fastapi.config",
+    "pico_fastapi.factory",
+])
+```
 
-3. **Is the decorator imported from pico_ioc?**
-   ```python
-   from pico_ioc import component  # Correct
-   # NOT: from pico_boot import component  # Wrong!
-   ```
+### 4. Does the controller have unsatisfied dependencies?
 
-4. **Is there an import error in the module?**
-   ```python
-   # Test the import
-   python -c "import myapp.services"
-   ```
-
-5. **Is a profile required?**
-   ```python
-   @component(profiles=["production"])  # Only active with profile
-   class MyService:
-       pass
-
-   # Activate the profile
-   container = init(modules=["myapp"], profiles=["production"])
-   ```
+If the controller's `__init__` requires a service that is not registered,
+the entire controller fails to instantiate. Check the logs for
+`ProviderNotFoundError`.
 
 ---
 
-### Getting Wrong Instance
+## "My `@validate` is not running" (pico-pydantic)
 
-**Symptoms:**
-- Component returns unexpected values
-- Singleton returns different instances
+You pass invalid data but the method executes without raising
+`ValidationFailedError`.
 
-**Diagnosis:**
+> **Key concept:** `@validate` is a marker, not a validator. The actual
+> validation happens in `ValidationInterceptor`, which only runs when the
+> component is resolved from the pico-ioc container.
 
-1. **Multiple containers?**
-   ```python
-   # Each init() creates a NEW container
-   container1 = init(modules=["myapp"])
-   container2 = init(modules=["myapp"])
+### 1. Are you getting the service from the container?
 
-   # These are DIFFERENT instances:
-   service1 = container1.get(MyService)
-   service2 = container2.get(MyService)
-   ```
+```python
+# Validation runs — interceptor is active
+service = container.get(UserService)
+await service.create_user({"bad": "data"})  # -> ValidationFailedError
 
-2. **Prototype scope?**
-   ```python
-   @component(scope="prototype")  # New instance each time
-   class MyService:
-       pass
-   ```
+# Validation does NOT run — no interceptor
+service = UserService()
+await service.create_user({"bad": "data"})  # -> executes normally
+```
 
-3. **Override in effect?**
-   ```python
-   container = init(
-       modules=["myapp"],
-       overrides={MyService: mock_service}  # Check for overrides
-   )
-   ```
+If you instantiate the class directly (with `UserService()` or in a unit
+test), the interceptor never fires. This is by design — see the
+[pico-pydantic testing guide](https://github.com/dperezcabrera/pico-pydantic)
+for patterns that work with and without the container.
+
+### 2. Is pico-pydantic loaded?
+
+If you use `pico-boot`, it is auto-discovered. If auto-discovery is
+disabled:
+
+```python
+container = init(modules=[
+    "myapp",
+    "pico_pydantic",      # registers ValidationInterceptor
+])
+```
+
+### 3. Does the parameter have a `BaseModel` type hint?
+
+Only parameters annotated with a Pydantic `BaseModel` subclass (or generics
+like `List[Model]`, `Optional[Model]`, `Union[Model, ...]`) are validated.
+Plain types are passed through:
+
+```python
+@validate
+async def process(self, data: UserModel, count: int):
+    # data  -> validated (BaseModel)
+    # count -> passed through (int)
+```
+
+### 4. Is the method decorated with `@validate`?
+
+```python
+from pico_pydantic import validate
+
+@component
+class UserService:
+    @validate                # <-- required on the method
+    async def create_user(self, data: UserCreate):
+        ...
+```
+
+Without the marker, the interceptor skips the method entirely.
 
 ---
 
-### Circular Dependency Error
+## Circular dependencies
 
-**Symptoms:**
 ```
 pico_ioc.exceptions.CircularDependencyError: Circular dependency detected: A -> B -> A
 ```
 
-**Solutions:**
+### Option 1: Use `lazy=True`
 
-1. **Use `lazy=True` on one of the components:**
-   ```python
-   @component(lazy=True)
-   class ServiceA:
-       def __init__(self, b: ServiceB):
-           self.b = b
-   ```
-
-2. **Use `@configure` to break the cycle:**
-   ```python
-   @component
-   class ServiceA:
-       @configure
-       def setup(self, b: ServiceB):
-           self.b = b
-   ```
-
-3. **Restructure dependencies:**
-   - Extract common functionality to a third service
-   - Use events instead of direct dependencies
-
----
-
-## Import Issues
-
-### "Module not found" Error
-
-**Symptoms:**
-```
-ModuleNotFoundError: No module named 'myapp'
-```
-
-**Diagnosis:**
-
-```bash
-# Check if module is in Python path
-python -c "import myapp"
-
-# Check Python path
-python -c "import sys; print(sys.path)"
-```
-
-**Solutions:**
-
-1. **Install the package:**
-   ```bash
-   pip install -e .
-   ```
-
-2. **Add to PYTHONPATH:**
-   ```bash
-   export PYTHONPATH="${PYTHONPATH}:/path/to/myapp"
-   ```
-
-3. **Check module name:**
-   ```python
-   # File: myapp/services.py
-   # Module name: myapp.services (not myapp/services)
-
-   container = init(modules=["myapp.services"])
-   ```
-
----
-
-### Import Order Issues
-
-**Symptoms:**
-- Works sometimes, fails other times
-- Depends on which module is imported first
-
-**Cause:** Circular imports at module level
-
-**Solution:**
-
-Move imports inside functions or use `TYPE_CHECKING`:
+Break the cycle by deferring one of the components:
 
 ```python
+@component(lazy=True)
+class ServiceA:
+    def __init__(self, b: ServiceB):
+        self.b = b
+```
+
+The container creates a proxy for `ServiceA`. The real instance is created
+on first access, by which time `ServiceB` already exists.
+
+### Option 2: Use `@configure` for post-init wiring
+
+```python
+@component
+class ServiceA:
+    @configure
+    def setup(self, b: ServiceB):
+        self.b = b
+```
+
+`@configure` runs after all components are instantiated, so the cycle
+doesn't exist at construction time.
+
+### Option 3: Restructure
+
+If A and B both depend on each other, they might belong in the same class,
+or the shared logic should be extracted to a third service.
+
+---
+
+## Circular imports (Python-level)
+
+```
+ImportError: cannot import name 'ServiceB' from partially initialized module
+```
+
+This is a Python import cycle, not a pico-ioc dependency cycle.
+
+**Fix:** Use `TYPE_CHECKING` guard:
+
+```python
+from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from myapp.other import OtherService
+    from myapp.other import ServiceB
 
 @component
-class MyService:
-    def __init__(self, other: "OtherService"):
+class ServiceA:
+    def __init__(self, other: "ServiceB"):
         self.other = other
 ```
 
----
-
-## Performance Issues
-
-### Slow Startup
-
-**Symptoms:**
-- Application takes long to start
-- Delay at `init()` call
-
-**Diagnosis:**
-
-1. **Many plugins installed:**
-   ```bash
-   python -c "from importlib.metadata import entry_points; print(len(list(entry_points(group='pico_boot.modules'))))"
-   ```
-
-2. **Heavy module imports:**
-   Profile the imports:
-   ```bash
-   python -X importtime -c "from pico_boot import init; init(modules=['myapp'])" 2>&1 | head -50
-   ```
-
-**Solutions:**
-
-1. **Disable auto-discovery:**
-   ```bash
-   export PICO_BOOT_AUTO_PLUGINS=false
-   ```
-
-2. **Explicitly list modules:**
-   ```python
-   container = init(modules=[
-       "myapp.services",
-       "myapp.repos",
-       # Only what you need
-   ])
-   ```
-
-3. **Lazy imports in modules:**
-   ```python
-   # Don't import heavy libraries at module level
-   @component
-   class MyService:
-       def heavy_operation(self):
-           import heavy_library  # Import when needed
-           return heavy_library.process()
-   ```
+pico-ioc resolves string annotations at container init time, after all
+modules are imported.
 
 ---
 
-## Testing Issues
+## Configuration not loading
 
-### Tests Pollute Each Other
+### Precedence
 
-**Symptoms:**
-- Tests pass individually, fail together
-- Order-dependent test failures
-
-**Cause:** Shared container state between tests
-
-**Solution:**
-
-Create fresh container per test:
+Later sources override earlier ones. Environment variables always win:
 
 ```python
-import pytest
-from pico_boot import init
+config = configuration(
+    YamlTreeSource("defaults.yaml"),   # lowest priority
+    YamlTreeSource("override.yaml"),   # overrides defaults
+    EnvSource(),                       # highest priority
+)
+```
 
+### `@configured` mapping mode
+
+The `@configured` decorator auto-detects flat vs tree mode:
+
+| Field types | Mode | ENV format |
+|---|---|---|
+| All primitives (`str`, `int`, `bool`) | flat | `PREFIX_FIELD` |
+| Any nested dataclass, list, or dict | tree | `PREFIX__NESTED__FIELD` (double underscore) |
+
+If auto-detection picks the wrong mode, force it:
+
+```python
+@configured(prefix="db", mapping="flat")
+@dataclass
+class DbConfig:
+    host: str
+    port: int
+```
+
+---
+
+## Container returns the wrong instance
+
+### Multiple containers
+
+Each `init()` call creates a new, independent container:
+
+```python
+c1 = init(modules=["myapp"])
+c2 = init(modules=["myapp"])
+
+c1.get(MyService) is not c2.get(MyService)  # True — different instances
+```
+
+### Prototype scope
+
+```python
+@component(scope="prototype")    # new instance every time
+class MyService: ...
+
+s1 = container.get(MyService)
+s2 = container.get(MyService)
+assert s1 is not s2
+```
+
+### Active overrides
+
+```python
+container = init(
+    modules=["myapp"],
+    overrides={MyService: mock_service},   # check for this
+)
+```
+
+---
+
+## Slow startup
+
+### Profile the imports
+
+```bash
+python -X importtime -c "from pico_boot import init; init(modules=['myapp'])" 2>&1 | head -50
+```
+
+### Reduce plugin scanning
+
+```bash
+export PICO_BOOT_AUTO_PLUGINS=false
+```
+
+Then list only the modules you need:
+
+```python
+container = init(modules=["myapp.services", "myapp.repos"])
+```
+
+### Defer heavy imports
+
+```python
+@component
+class HeavyService:
+    def process(self):
+        import pandas as pd          # import when needed, not at module level
+        return pd.DataFrame(...)
+```
+
+---
+
+## Tests pollute each other
+
+Create a fresh container per test and shut it down after:
+
+```python
 @pytest.fixture
-def container():
+def container(tmp_path):
     c = init(modules=["myapp"])
     yield c
     c.shutdown()
-
-def test_one(container):
-    service = container.get(MyService)
-    # ...
-
-def test_two(container):
-    service = container.get(MyService)  # Fresh instance
-    # ...
 ```
+
+For integration tests that include pico-fastapi, also create a fresh
+`FastAPI` app per test (see the pico-fastapi testing guide).
 
 ---
 
-### Mocking Doesn't Work
+## Getting help
 
-**Symptoms:**
-- Mock objects not used
-- Real implementations called
+If this guide doesn't cover your issue:
 
-**Cause:** Container created before mock applied
-
-**Solution:**
-
-Use container overrides:
-
-```python
-def test_with_mock():
-    mock_repo = Mock(spec=Repository)
-    mock_repo.get_all.return_value = []
-
-    container = init(
-        modules=["myapp"],
-        overrides={Repository: mock_repo}
-    )
-
-    service = container.get(MyService)
-    service.process()
-
-    mock_repo.get_all.assert_called_once()
-```
-
----
-
-## Environment Issues
-
-### Different Behavior in Production
-
-**Symptoms:**
-- Works in development, fails in production
-- Missing plugins in Docker
-
-**Diagnosis:**
-
-1. **Check installed packages:**
-   ```bash
-   pip list | grep pico
-   ```
-
-2. **Check environment variables:**
-   ```bash
-   env | grep PICO
-   ```
-
-3. **Check Python version:**
-   ```bash
-   python --version  # Must be 3.11+
-   ```
-
-**Solutions:**
-
-1. **Pin dependencies:**
-   ```
-   pico-boot==0.1.0
-   pico-ioc==2.2.0
-   pico-fastapi==0.2.0
-   ```
-
-2. **Verify Docker installs all packages:**
-   ```dockerfile
-   RUN pip install -r requirements.txt
-   ```
-
-3. **Log plugin discovery:**
+1. Enable debug logging:
    ```python
    import logging
-   logging.getLogger("pico_boot").setLevel(logging.INFO)
+   logging.getLogger("pico_boot").setLevel(logging.DEBUG)
+   logging.getLogger("pico_ioc").setLevel(logging.DEBUG)
    ```
 
----
+2. Create a minimal reproduction script.
 
-## Getting Help
-
-If you can't resolve your issue:
-
-1. **Search existing issues:** [GitHub Issues](https://github.com/dperezcabrera/pico-boot/issues)
-
-2. **Create a minimal reproduction:**
-   ```python
-   # minimal_repro.py
-   from pico_ioc import component
-   from pico_boot import init
-
-   @component
-   class MyService:
-       pass
-
-   container = init(modules=[__name__])
-   service = container.get(MyService)  # Error here
-   ```
-
-3. **Open an issue** with:
+3. Open an issue at [pico-boot](https://github.com/dperezcabrera/pico-boot/issues) or the relevant package repo with:
    - Python version
-   - pico-boot version
-   - pico-ioc version
+   - Package versions (`pip list | grep pico`)
+   - Full traceback
    - Minimal reproduction code
-   - Full error traceback
