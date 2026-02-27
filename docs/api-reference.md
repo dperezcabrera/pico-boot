@@ -50,7 +50,7 @@ container = init(
 from pico_boot import init
 
 # Basic usage
-container = init(modules=["myapp.services", "myapp.repos"])
+container = init(modules=["myapp"])
 
 # With profiles
 container = init(modules=["myapp"], profiles=["production"])

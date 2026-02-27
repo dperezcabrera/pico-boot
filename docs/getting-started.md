@@ -190,7 +190,7 @@ config = configuration(
 )
 
 container = init(
-    modules=["myapp.config", "myapp.services"],
+    modules=["myapp"],
     config=config
 )
 ```

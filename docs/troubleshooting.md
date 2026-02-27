@@ -437,7 +437,7 @@ export PICO_BOOT_AUTO_PLUGINS=false
 Then list only the modules you need:
 
 ```python
-container = init(modules=["myapp.services", "myapp.repos"])
+container = init(modules=["myapp"])
 ```
 
 ### Defer heavy imports

@@ -242,7 +242,7 @@ def main():
         YamlSource("application.yaml"),
         EnvSource()
     )
-    container = init(modules=["myapp.config", "myapp.services"], config=config)
+    container = init(modules=["myapp"], config=config)
 
     service = container.get(GreetingService)
     print(service.greet("Alice"))
