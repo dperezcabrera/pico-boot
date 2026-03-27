@@ -138,6 +138,8 @@ plugins:
 nav:
   - Home: README.md
   - Getting Started: getting-started.md
+  - Tutorials:
+    - Full CRUD API: tutorial-full-crud.md
   - User Guide:
     - Configuration: configuration.md
     - Plugins Overview: plugins.md
