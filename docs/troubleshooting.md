@@ -53,9 +53,8 @@ container = init(modules=[
 ])
 ```
 
-> **Tip:** `init(modules=["myapp.services"])` scans `myapp/services/__init__.py`,
-> not every file in the directory. Either re-export from `__init__.py` or list
-> each submodule explicitly.
+> **Tip:** Use `init(modules=["myapp"])` — pico-boot scans the package
+> recursively, discovering all `@component` classes in submodules automatically.
 
 ### 3. Can Python import the module?
 

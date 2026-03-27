@@ -8,7 +8,7 @@ Typical usage::
 
     from pico_boot import init
 
-    container = init(modules=["myapp.services", "myapp.repos"])
+    container = init(modules=["myapp"])  # scans recursively
 
 Plugins that register the ``pico_boot.modules`` entry-point group are
 loaded automatically unless the ``PICO_BOOT_AUTO_PLUGINS`` environment
@@ -264,7 +264,7 @@ else:
 
         Example:
             >>> from pico_boot import init
-            >>> container = init(modules=["myapp.services"])
+            >>> container = init(modules=["myapp"])  # scans recursively
             >>> service = container.get(MyService)
         """
         bound = _IOC_INIT_SIG.bind(*args, **kwargs)

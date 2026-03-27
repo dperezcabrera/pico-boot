@@ -7,10 +7,8 @@ from .services import UserService
 def main():
     config = configuration(YamlTreeSource("application.yaml"))
 
-    container = init(
-        modules=["myapp.config", "myapp.services"],
-        config=config,
-    )
+    # pico-boot scans "myapp" recursively — no need to list submodules
+    container = init(modules=["myapp"], config=config)
 
     user_service = container.get(UserService)
 

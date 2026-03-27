@@ -26,14 +26,14 @@ os.environ["PICO_BOOT_AUTO_PLUGINS"] = "false"
 
 from pico_boot import init
 
-container = init(modules=["myapp.services"])  # only your modules, no plugins
+container = init(modules=["myapp"])  # only your modules, no plugins
 ```
 
 When auto-discovery is disabled you can still load specific plugins by adding
 them to the *modules* list explicitly:
 
 ```python
-container = init(modules=["myapp.services", "pico_sqlalchemy"])
+container = init(modules=["myapp", "pico_sqlalchemy"])
 ```
 
 ## Enable Only Specific Plugins

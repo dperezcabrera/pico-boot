@@ -58,11 +58,11 @@ Usage:
 from pico_boot import init
 
 def test_unit_isolated(no_auto_plugins):
-    container = init(modules=["myapp.services"])
+    container = init(modules=["myapp"])
     # only myapp.services is loaded
 
 def test_integration_full(with_auto_plugins):
-    container = init(modules=["myapp.services"])
+    container = init(modules=["myapp"])
     # all installed plugins are also loaded
 ```
 
@@ -77,7 +77,7 @@ from pico_boot import init
 
 @pytest.fixture()
 def container(no_auto_plugins):
-    c = init(modules=["myapp.services"])
+    c = init(modules=["myapp"])
     yield c
     c.shutdown()
 
@@ -99,7 +99,7 @@ def test_with_mock(no_auto_plugins):
     mock_repo.find_all.return_value = []
 
     container = init(
-        modules=["myapp.services"],
+        modules=["myapp"],
         overrides={Repository: mock_repo},
     )
 

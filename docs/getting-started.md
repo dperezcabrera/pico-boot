@@ -93,7 +93,7 @@ from myapp.services import UserService
 def main():
     # Initialize the container
     # pico-boot scans the modules for @component decorated classes
-    container = init(modules=["myapp.services"])
+    container = init(modules=["myapp"])
 
     # Get your service - dependencies are resolved automatically
     user_service = container.get(UserService)
@@ -332,7 +332,7 @@ class MockDatabase:
 @pytest.fixture
 def container():
     c = init(
-        modules=["myapp.services"],
+        modules=["myapp"],
         overrides={DatabaseService: MockDatabase()}
     )
     yield c

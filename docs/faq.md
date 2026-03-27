@@ -291,7 +291,7 @@ classes/functions whose owning module can be determined:
 
 ```python
 # Good
-container = init(modules=["myapp.services"])
+container = init(modules=["myapp"])  # scans recursively
 
 # Bad -- plain object has no __module__
 container = init(modules=[object()])
