@@ -9,6 +9,7 @@
 [![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=dperezcabrera_pico-boot&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=dperezcabrera_pico-boot)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=dperezcabrera_pico-boot&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=dperezcabrera_pico-boot)
 [![Docs](https://img.shields.io/badge/Docs-pico--boot-blue?style=flat&logo=readthedocs&logoColor=white)](https://dperezcabrera.github.io/pico-boot/)
+[![Interactive Lab](https://img.shields.io/badge/Learn-online-green?style=flat&logo=python&logoColor=white)](https://dperezcabrera.github.io/pico-learn/)
 
 **Zero-configuration bootstrap for the Pico ecosystem.**
 
