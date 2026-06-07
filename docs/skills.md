@@ -1,6 +1,6 @@
 # AI Coding Skills
 
-[Claude Code](https://code.claude.com) and [OpenAI Codex](https://openai.com/index/introducing-codex/) skills for AI-assisted development with pico-boot and the pico-framework ecosystem.
+[Claude Code](https://code.claude.com) and [OpenAI Codex](https://openai.com/index/introducing-codex/) skills for AI-assisted development with pico-boot and the pico ecosystem.
 
 ## Installation
 
@@ -10,7 +10,7 @@ Install pico-boot skills only:
 curl -sL https://raw.githubusercontent.com/dperezcabrera/pico-skills/main/install.sh | bash -s -- boot
 ```
 
-Or install all pico-framework skills (ioc, boot, fastapi, sqlalchemy, celery, pydantic, agent):
+Or install all pico skills (ioc, boot, fastapi, sqlalchemy, celery, pydantic, agent):
 
 ```bash
 curl -sL https://raw.githubusercontent.com/dperezcabrera/pico-skills/main/install.sh | bash
@@ -58,7 +58,7 @@ Adds a new pico-ioc component to the current project. Supports multiple componen
 
 ### `/add-tests`
 
-Generates tests for existing pico-framework components. Creates unit tests with proper container setup, overrides, and assertions.
+Generates tests for existing pico components. Creates unit tests with proper container setup, overrides, and assertions.
 
 ```
 /add-tests UserService

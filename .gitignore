@@ -13,3 +13,4 @@ site/
 releases/
 manage.sh
 _version.py
+.hypothesis/
