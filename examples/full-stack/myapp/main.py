@@ -1,5 +1,6 @@
+from pico_ioc import YamlTreeSource, configuration
+
 from pico_boot import init
-from pico_ioc import configuration, YamlTreeSource
 
 from .services import UserService
 

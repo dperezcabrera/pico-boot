@@ -1,6 +1,6 @@
 from pico_ioc import component
 
-from .config import DatabaseConfig, AppConfig
+from .config import AppConfig, DatabaseConfig
 
 
 @component
