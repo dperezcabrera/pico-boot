@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.2] - 2026-06-10
+
+### Added
+- **PEP 561**: `py.typed` marker — the package now advertises inline type information to type checkers.
+- **Docs**: full API docstrings, mkdocstrings API reference, how-to guides, troubleshooting rewrite, full-CRUD tutorial, and Mermaid diagrams.
+- **Docs**: executable documentation examples and Codex compatibility for skills.
+
+### Changed
+- **Docs**: recommend the root-module pattern — `init(modules=["myapp"])` scans recursively instead of listing submodules.
+- **Quality**: ruff complexity rules (C901, PLR1702); deduplicated test suite via parametrize/fixtures.
+
+### Fixed
+- **Tests**: auto-discovery integration test no longer depends on environment plugins.
+- **Packaging**: removed tracked `_version.py` (now generated and ignored).
+
+---
+
 ## [0.1.1] - 2026-02-06
 
 ### Added
