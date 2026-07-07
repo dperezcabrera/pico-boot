@@ -102,7 +102,7 @@ class TestInitWithAutoPlugins:
 
                 mock_load.assert_called_once()
 
-    @pytest.mark.parametrize("value", ["false", "0", "no"])
+    @pytest.mark.parametrize("value", ["false", "0", "no", "off", "FALSE", "Off"])
     def test_auto_plugins_disabled(self, value):
         """Auto-discovery should be disabled when PICO_BOOT_AUTO_PLUGINS is falsy."""
         os.environ["PICO_BOOT_AUTO_PLUGINS"] = value
