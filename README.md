@@ -18,7 +18,7 @@ Pico-Boot is a thin orchestration layer over [pico-ioc](https://github.com/dpere
 - **Auto-discovery of plugins** via Python entry points
 - **Custom scanner harvesting** from loaded modules
 
-> 🐍 Requires Python 3.11+
+> Requires Python 3.11+
 
 ---
 
