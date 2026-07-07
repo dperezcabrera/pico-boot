@@ -80,8 +80,29 @@ class TestLoadPluginModules:
 
             assert result == []
 
-    def test_handles_import_error_gracefully(self):
-        """Should log warning and continue when plugin import fails."""
+    def test_handles_missing_module_gracefully(self):
+        """Should log warning and continue when the plugin module is absent."""
+        mock_ep = MagicMock()
+        mock_ep.name = "absent_plugin"
+        mock_ep.module = "absent_plugin"
+
+        with patch("pico_boot.entry_points") as mock_eps:
+            mock_result = MagicMock()
+            mock_result.select.return_value = [mock_ep]
+            mock_eps.return_value = mock_result
+
+            with patch("pico_boot.import_module", side_effect=ModuleNotFoundError("Module not found")):
+                with patch("pico_boot.logger") as mock_logger:
+                    result = pico_boot._load_plugin_modules()
+
+                    assert result == []
+                    mock_logger.warning.assert_called_once()
+                    call_args = mock_logger.warning.call_args[0]
+                    assert "Failed to load pico-boot plugin" in call_args[0]
+                    mock_logger.error.assert_not_called()
+
+    def test_broken_plugin_logs_error_with_traceback(self):
+        """A plugin that exists but fails to import must log ERROR, not WARNING."""
         mock_ep = MagicMock()
         mock_ep.name = "broken_plugin"
         mock_ep.module = "broken_plugin"
@@ -91,14 +112,14 @@ class TestLoadPluginModules:
             mock_result.select.return_value = [mock_ep]
             mock_eps.return_value = mock_result
 
-            with patch("pico_boot.import_module", side_effect=ImportError("Module not found")):
+            with patch("pico_boot.import_module", side_effect=SyntaxError("bad plugin code")):
                 with patch("pico_boot.logger") as mock_logger:
                     result = pico_boot._load_plugin_modules()
 
                     assert result == []
-                    mock_logger.warning.assert_called_once()
-                    call_args = mock_logger.warning.call_args[0]
-                    assert "Failed to load pico-boot plugin" in call_args[0]
+                    mock_logger.error.assert_called_once()
+                    assert mock_logger.error.call_args.kwargs.get("exc_info") is True
+                    mock_logger.warning.assert_not_called()
 
     def test_deduplicates_plugins(self):
         """Should deduplicate plugins with same module name."""

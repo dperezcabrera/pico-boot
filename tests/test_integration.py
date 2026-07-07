@@ -11,6 +11,7 @@ import os
 import sys
 from types import ModuleType
 from typing import Any, Callable, Optional, Tuple, Union
+from unittest.mock import patch
 
 import pytest
 from pico_ioc import PicoContainer, component, configured, provides
@@ -240,6 +241,20 @@ class TestScannerHarvestingIntegration:
         """Without the scanner module, PlainService should NOT be in the container."""
         container = pico_container(modules=[__name__])
         assert not container.has(PlainService)
+
+    def test_malformed_pico_scanners_is_ignored_with_warning(self, pico_container):
+        """PICO_SCANNERS that is not a list (e.g. a str) is skipped, not exploded char-by-char."""
+        bad_module = ModuleType("_test_bad_scanner_mod")
+        bad_module.PICO_SCANNERS = "NotAListOfScanners"
+        sys.modules[bad_module.__name__] = bad_module
+        try:
+            with patch("pico_boot.logger") as mock_logger:
+                container = pico_container(modules=[__name__, "_test_bad_scanner_mod"])
+                assert not container.has(PlainService)
+                mock_logger.warning.assert_called_once()
+                assert "_test_bad_scanner_mod" in mock_logger.warning.call_args[0][1]
+        finally:
+            del sys.modules[bad_module.__name__]
 
     def test_harvested_scanner_coexists_with_decorated_components(self, pico_container):
         """Harvested scanners should work alongside normal @component classes."""

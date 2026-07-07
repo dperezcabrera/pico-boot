@@ -147,8 +147,17 @@ else:
         scanners: list = []
         for m in modules:
             module_scanners = getattr(m, "PICO_SCANNERS", None)
-            if module_scanners:
-                scanners.extend(module_scanners)
+            if not module_scanners:
+                continue
+            if isinstance(module_scanners, str) or not hasattr(module_scanners, "__iter__"):
+                # A str would extend() char-by-char and blow up far from here.
+                logger.warning(
+                    "Module %s defines PICO_SCANNERS but it is not a list/tuple of scanners (%r); ignoring it",
+                    m.__name__,
+                    type(module_scanners).__name__,
+                )
+                continue
+            scanners.extend(module_scanners)
         return scanners
 
     def _load_plugin_modules(group: str = "pico_boot.modules") -> List[ModuleType]:
@@ -194,12 +203,25 @@ else:
                 if ep.module in ("pico_ioc", "pico_boot"):
                     continue
                 m = import_module(ep.module)
-            except Exception as exc:
+            except ModuleNotFoundError as exc:
+                # Benign: the distribution advertises an entry point but the
+                # module is absent (partial install, optional extra).
                 logger.warning(
                     "Failed to load pico-boot plugin entry point '%s' (%s): %s",
                     ep.name,
                     ep.module,
                     exc,
+                )
+                continue
+            except Exception:
+                # The module exists but is broken (SyntaxError, failing
+                # import-time code). The app will boot without it — make the
+                # degradation loud and keep the traceback.
+                logger.error(
+                    "pico-boot plugin '%s' (%s) exists but failed to import; the application will start WITHOUT it",
+                    ep.name,
+                    ep.module,
+                    exc_info=True,
                 )
                 continue
 
@@ -273,7 +295,7 @@ else:
         base_modules = _normalize_modules(_to_module_list(bound.arguments["modules"]))
 
         auto_flag = os.getenv("PICO_BOOT_AUTO_PLUGINS", "true").lower()
-        auto_plugins = auto_flag not in ("0", "false", "no")
+        auto_plugins = auto_flag not in ("0", "false", "no", "off")
 
         if auto_plugins:
             plugin_modules = _load_plugin_modules()

@@ -5,4 +5,3 @@ import logging
 # griffe's logger is patched by mkdocstrings to use mkdocs.plugins.* namespace.
 for name in ("griffe", "mkdocs.plugins.griffe", "_griffe"):
     logging.getLogger(name).setLevel(logging.ERROR)
-
