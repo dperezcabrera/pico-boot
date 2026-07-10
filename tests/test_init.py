@@ -45,10 +45,12 @@ class TestInit:
                 call_kwargs = mock_ioc_init.call_args
                 modules = call_kwargs.kwargs.get("modules") or call_kwargs.args[0]
                 # Should have 3 unique modules
-                assert len(modules) == 3
+                # os, sys, collections + pico_ioc.event_bus (core infra desde 0.2.0)
+                assert len(modules) == 4
 
-    def test_init_merges_plugin_modules(self):
+    def test_init_merges_plugin_modules(self, monkeypatch):
         """Should merge discovered plugins with user modules."""
+        monkeypatch.setenv("PICO_BOOT_AUTO_PLUGINS", "true")
         mock_plugin = ModuleType("test_plugin")
         mock_plugin.__name__ = "test_plugin"
 
@@ -319,8 +321,9 @@ class TestScannerHarvestingInInit:
                     scanners = mock_ioc_init.call_args.kwargs["custom_scanners"]
                     assert scanners == [user_sc, harvested_sc]
 
-    def test_harvests_from_plugin_modules_too(self):
+    def test_harvests_from_plugin_modules_too(self, monkeypatch):
         """Scanners from auto-discovered plugins should be harvested."""
+        monkeypatch.setenv("PICO_BOOT_AUTO_PLUGINS", "true")
         scanner = MagicMock()
         plugin_mod = self._make_module("plugin_with_sc", [scanner])
 
