@@ -288,10 +288,18 @@ broker registrars) and asserts, in order:
 6. A second order hits the Redis-backed catalog cache — zero extra lookups.
 7. `invoices.generate` is registered on the Celery app for the worker.
 8. The 03:00 reconciliation job is armed on the scheduler.
-9. **Hot reload**: flipping `resilience.enabled=false` +
-   `container.refresh_config()` (what `POST /actuator/refresh` does) turns
-   retries off live — the same request now fails on the first attempt — and
-   flipping it back restores them.
+9. **Hot reload over HTTP**: `POST /actuator/refresh` reports
+   `{"changed": ["resilience"]}` and turns retries off live — the same
+   request now fails on the first attempt — and flipping it back restores
+   them.
+10. **Alembic for real** (level 2): `database.migrations_path` upgrades a
+   real Postgres to `head`; the revision is asserted in `alembic_version`.
+11. **A real Celery worker** (level 2): `invoices.generate` is dispatched
+   through the real broker and its result collected from the backend.
+12. **Real JWT auth** (level 2, uvicorn): the protected endpoint answers 401
+   without a token and 200 with an operator token minted by the embedded
+   issuer — the pairing that uncovered pico-fastapi 0.3.1 and
+   pico-client-auth 0.4.3.
 
 ## Level 2: against real infrastructure
 
