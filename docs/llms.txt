@@ -1,0 +1,26 @@
+# pico-boot
+
+> Zero-configuration bootstrap for the Pico ecosystem
+
+## Docs
+
+- [Home](https://dperezcabrera.github.io/pico-boot/)
+- [Getting Started](https://dperezcabrera.github.io/pico-boot/getting-started/)
+- [Flagship Use Case](https://dperezcabrera.github.io/pico-boot/flagship/)
+- [Full CRUD API](https://dperezcabrera.github.io/pico-boot/tutorial-full-crud/)
+- [Configuration](https://dperezcabrera.github.io/pico-boot/configuration/)
+- [Plugins Overview](https://dperezcabrera.github.io/pico-boot/plugins/)
+- [Creating Plugins](https://dperezcabrera.github.io/pico-boot/creating-plugins/)
+- [API Reference](https://dperezcabrera.github.io/pico-boot/api-reference/)
+- [Architecture](https://dperezcabrera.github.io/pico-boot/architecture/)
+- [AI Coding Skills](https://dperezcabrera.github.io/pico-boot/skills/)
+- [FAQ](https://dperezcabrera.github.io/pico-boot/faq/)
+- [Troubleshooting](https://dperezcabrera.github.io/pico-boot/troubleshooting/)
+- [Ecosystem](https://dperezcabrera.github.io/pico-boot/ecosystem/)
+
+## For agents
+
+- [Full docs in one file](https://dperezcabrera.github.io/pico-boot/llms-full.txt)
+- [AGENTS.md (conventions and boundaries)](https://raw.githubusercontent.com/dperezcabrera/pico-boot/main/AGENTS.md)
+- [Flagship use case (whole ecosystem wired)](https://dperezcabrera.github.io/pico-boot/flagship/)
+- [PyPI](https://pypi.org/project/pico-boot/)
