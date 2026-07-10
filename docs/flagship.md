@@ -109,6 +109,9 @@ class SchemaSetup:
         async def _create():
             async with engine.begin() as conn:
                 await conn.run_sync(AppBase.metadata.create_all)
+            # asyncpg binds pooled connections to the loop that created
+            # them; drop the DDL loop's pool so request loops start fresh.
+            await engine.dispose()
 
         asyncio.run(_create())
 
@@ -289,6 +292,16 @@ broker registrars) and asserts, in order:
    `container.refresh_config()` (what `POST /actuator/refresh` does) turns
    retries off live — the same request now fails on the first attempt — and
    flipping it back restores them.
+
+## Level 2: against real infrastructure
+
+The same application also runs against real Postgres, Redis, RabbitMQ and
+Kafka (docker compose): the rabbit event round-trips through a real topic
+exchange into `StockProjection`, the kafka record through a real consumer
+group into `AnalyticsProjection`, the catalog entry is visible as a
+`pico:cache:*` key in Redis, and hot reload flips retries live against the
+real gateway path. Only the payments gateway stays mocked — it is a third
+party.
 
 ## Testing it (pico-testing)
 
