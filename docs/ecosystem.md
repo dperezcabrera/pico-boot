@@ -112,16 +112,10 @@ FastAPI integration with automatic dependency injection in routes.
 ```python
 from fastapi import FastAPI
 from pico_boot import init
-from pico_fastapi import PicoFastAPI
 
-app = FastAPI()
+# @controller classes in "myapp" register their routes automatically
 container = init(modules=["myapp"])
-pico = PicoFastAPI(container)
-pico.install(app)
-
-@app.get("/")
-def index(service: MyService):  # Injected automatically
-    return service.get_data()
+app = container.get(FastAPI)
 ```
 
 ### pico-sqlalchemy
@@ -264,7 +258,7 @@ Create your application:
 # main.py
 from fastapi import FastAPI
 from pico_boot import init
-from pico_fastapi import PicoFastAPI
+from pico_fastapi import controller, get
 from pico_ioc import component
 from sqlalchemy.orm import Session
 
@@ -276,13 +270,17 @@ class UserRepository:
     def get_all(self):
         return self.session.query(User).all()
 
-app = FastAPI()
-container = init(modules=[__name__])
-PicoFastAPI(container).install(app)
+@controller(prefix="/users")
+class UserController:
+    def __init__(self, repo: UserRepository):
+        self._repo = repo
 
-@app.get("/users")
-def list_users(repo: UserRepository):
-    return repo.get_all()
+    @get("")
+    async def list_users(self):
+        return self._repo.get_all()
+
+container = init(modules=[__name__])
+app = container.get(FastAPI)
 ```
 
 Run:

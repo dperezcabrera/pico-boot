@@ -386,7 +386,7 @@ def test_auto_discovery():
 
 Avoid configuration conflicts:
 
-```python
+```text
 # Good - unique prefix
 @configured(prefix="my_plugin")
 
@@ -509,6 +509,6 @@ my_plugin:        # <-- This must match prefix
   api_key: xxx
 ```
 
-```python
+```text
 @configured(prefix="my_plugin")  # <-- Same prefix
 ```
