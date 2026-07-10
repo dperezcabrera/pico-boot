@@ -171,7 +171,7 @@ container = init(modules=["myapp"])  # Only myapp is loaded
 
 Avoid conflicts with a unique prefix:
 
-```python
+```text
 @configured(prefix="my_plugin")  # Good
 @configured(prefix="database")   # Bad - too generic
 ```

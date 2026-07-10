@@ -261,6 +261,7 @@ Plain types are passed through:
 ```python
 @validate
 async def process(self, data: UserModel, count: int):
+    ...
     # data  -> validated (BaseModel)
     # count -> passed through (int)
 ```
