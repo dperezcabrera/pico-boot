@@ -233,14 +233,14 @@ class GreetingService:
 ### main.py
 
 ```python
-from pico_ioc import configuration, YamlSource, EnvSource
+from pico_ioc import configuration, YamlTreeSource, EnvSource
 from pico_boot import init
 from .services import GreetingService
 
 def main():
     # Load configuration via pico-ioc, let pico-boot discover plugins
     config = configuration(
-        YamlSource("application.yaml"),
+        YamlTreeSource("application.yaml"),
         EnvSource()
     )
     container = init(modules=["myapp"], config=config)

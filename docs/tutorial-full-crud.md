@@ -127,7 +127,7 @@ Each pico package owns exactly one layer. The IoC container resolves constructor
 <!-- Band 1: HTTP — height 108, y=16..124 -->
 <rect x="20" y="16" width="640" height="108" rx="10" fill="#E6F1FB" stroke="#B5D4F4" stroke-width="0.5"/>
 <text class="la-ts" x="36" y="33" fill="#0C447C">HTTP layer — pico-fastapi · pico-client-auth</text>
-<!-- 3 boxes: w=186, gap=20 → 3×186+2×20=598, left=40+1=41 -->
+<!-- 3 boxes: w=186, gap=20  3×186+2×20=598, left=40+1=41 -->
 <rect x="40" y="42" width="186" height="68" rx="7" fill="#185fa5" stroke="#0C447C" stroke-width="0.5"/>
 <text class="la-th" x="133" y="72" text-anchor="middle" dominant-baseline="central" fill="#fff">ProductController</text>
 <text class="la-ts" x="133" y="96" text-anchor="middle" fill="#B5D4F4">@controller · /api/v1/products</text>
@@ -154,7 +154,7 @@ Each pico package owns exactly one layer. The IoC container resolves constructor
 <!-- Band 3: Data — y=280..388 -->
 <rect x="20" y="280" width="640" height="108" rx="10" fill="#FAEEDA" stroke="#FAC775" stroke-width="0.5"/>
 <text class="la-ts" x="36" y="297" fill="#633806">Data layer — pico-sqlalchemy</text>
-<!-- 2 boxes centred: w=270, gap=40 → total 580, left=50 -->
+<!-- 2 boxes centred: w=270, gap=40  total 580, left=50 -->
 <rect x="50" y="306" width="270" height="68" rx="7" fill="#854F0B" stroke="#633806" stroke-width="0.5"/>
 <text class="la-th" x="185" y="336" text-anchor="middle" dominant-baseline="central" fill="#fff">ProductRepository</text>
 <text class="la-ts" x="185" y="360" text-anchor="middle" fill="#FAC775">@repository · @query (declarative)</text>
@@ -172,16 +172,16 @@ Each pico package owns exactly one layer. The IoC container resolves constructor
 <text class="la-th" x="495" y="468" text-anchor="middle" dominant-baseline="central" fill="#fff">JWKS endpoint</text>
 <text class="la-ts" x="495" y="492" text-anchor="middle" fill="#D3D1C7">RSA public keys · TTL cache</text>
 
-<!-- Arrows HTTP → Service (col centres: 133, 339, 545) -->
+<!-- Arrows HTTP  Service (col centres: 133, 339, 545) -->
 <line x1="133" y1="110" x2="133" y2="174" stroke="#378ADD" stroke-width="1.2" marker-end="url(#la-arr)"/>
 <line x1="339" y1="110" x2="339" y2="174" stroke="#378ADD" stroke-width="1.2" marker-end="url(#la-arr)"/>
 <line x1="545" y1="110" x2="545" y2="174" stroke="#378ADD" stroke-width="1.2" marker-end="url(#la-arr)"/>
 
-<!-- Arrows Service → Data (L-bends to stay clear of band borders) -->
+<!-- Arrows Service  Data (L-bends to stay clear of band borders) -->
 <path d="M133 242 L133 264 L185 264 L185 306" stroke="#639922" stroke-width="1.2" fill="none" marker-end="url(#la-arr)"/>
 <path d="M339 242 L339 264 L495 264 L495 306" stroke="#639922" stroke-width="1" stroke-dasharray="5 3" fill="none" marker-end="url(#la-arr)"/>
 
-<!-- Arrows Data → Infra -->
+<!-- Arrows Data  Infra -->
 <line x1="185" y1="374" x2="185" y2="438" stroke="#BA7517" stroke-width="1.2" marker-end="url(#la-arr)"/>
 <line x1="495" y1="374" x2="495" y2="438" stroke="#BA7517" stroke-width="1.2" marker-end="url(#la-arr)"/>
 
@@ -246,10 +246,10 @@ The Products API and the Auth server run as **independent processes**. The API n
 <text class="as-ts" x="209" y="98" text-anchor="middle" fill="#534AB7">POST /login</text>
 <path d="M258 140 L160 140" stroke="#534AB7" stroke-width="1.2" marker-end="url(#as-arr)" fill="none"/>
 <text class="as-ts" x="209" y="134" text-anchor="middle" fill="#534AB7">JWT token</text>
-<!-- Client → API with Bearer -->
+<!-- Client  API with Bearer -->
 <path d="M160 196 L300 360 L498 196" stroke="#0F6E56" stroke-width="1.2" marker-end="url(#as-arr)" fill="none"/>
 <text class="as-ts" x="300" y="384" text-anchor="middle" fill="#0F6E56">Bearer &lt;jwt&gt;</text>
-<!-- API → JWKS (cached fetch) -->
+<!-- API  JWKS (cached fetch) -->
 <path d="M516 172 L422 182" stroke="#7F77DD" stroke-width="1.2" stroke-dasharray="5 3" marker-end="url(#as-arr)" fill="none"/>
 <text class="as-ts" x="468" y="162" text-anchor="middle" fill="#7F77DD">GET /jwks.json</text>
 <text class="as-ts" x="468" y="176" text-anchor="middle" fill="#9c9a92">cached · TTL 300s</text>
@@ -360,18 +360,18 @@ pico-client-auth (automatic middleware)
   ├─ validates JWT signature against JWKS
   ├─ checks iss, aud, exp
   ├─ resolves roles via RoleResolver
-  └─ populates SecurityContext          →  401 if token invalid/missing
+  └─ populates SecurityContext            401 if token invalid/missing
          │
          ▼
-@requires_role("product-manager")      →  403 if insufficient permissions
+@requires_role("product-manager")        403 if insufficient permissions
          │
          ▼
 ProductController.create_product(body: ProductCreate)
-  └─ FastAPI validates the body         →  422 if HTTP data invalid
+  └─ FastAPI validates the body           422 if HTTP data invalid
          │
          ▼
 ProductService.create(data: ProductData)
-  └─ pico-pydantic @validate            →  ValidationFailedError if contract broken
+  └─ pico-pydantic @validate              ValidationFailedError if contract broken
          │
          ▼
 @transactional opens async session
@@ -734,7 +734,7 @@ class ProductController:
     @post("/", response_model=ProductResponse, status_code=status.HTTP_201_CREATED)
     @requires_role("product-manager")
     async def create_product(self, body: ProductCreate):
-        # model_dump() → dict; pico-pydantic converts it to ProductData in the service
+        # model_dump()  dict; pico-pydantic converts it to ProductData in the service
         product = await self.service.create(body.model_dump())
         return ProductResponse.model_validate(product)
 

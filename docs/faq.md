@@ -175,11 +175,11 @@ No. Pico-boot focuses on plugin discovery and scanner harvesting. Configuration 
 You combine them like this:
 
 ```python
-from pico_ioc import configuration, YamlSource, EnvSource
+from pico_ioc import configuration, YamlTreeSource, EnvSource
 from pico_boot import init
 
 config = configuration(
-    YamlSource("application.yaml"),
+    YamlTreeSource("application.yaml"),
     EnvSource()
 )
 

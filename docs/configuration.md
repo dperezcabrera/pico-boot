@@ -7,11 +7,11 @@ Configuration in the Pico ecosystem is handled by **pico-ioc**. Pico-Boot does n
 You build a `ContextConfig` using pico-ioc's `configuration()` function and pass it to `init()`:
 
 ```python
-from pico_ioc import configuration, YamlSource, EnvSource
+from pico_ioc import configuration, YamlTreeSource, EnvSource
 from pico_boot import init
 
 config = configuration(
-    YamlSource("application.yaml"),
+    YamlTreeSource("application.yaml"),
     EnvSource()  # Environment variables override file values
 )
 
@@ -70,8 +70,8 @@ class DatabaseConfig:
 ```
 
 The `prefix` maps to the YAML structure:
-- `prefix="database"` → reads from `database:` key
-- `prefix="cache"` → reads from `cache:` key
+- `prefix="database"`  reads from `database:` key
+- `prefix="cache"`  reads from `cache:` key
 
 ## Environment Variable Overrides
 
@@ -224,11 +224,11 @@ class LoggingConfig:
 
 ```python
 # main.py
-from pico_ioc import configuration, YamlSource, EnvSource
+from pico_ioc import configuration, YamlTreeSource, EnvSource
 from pico_boot import init
 
 config = configuration(
-    YamlSource("application.yaml"),
+    YamlTreeSource("application.yaml"),
     EnvSource()
 )
 
