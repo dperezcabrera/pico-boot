@@ -292,7 +292,12 @@ else:
         bound = _IOC_INIT_SIG.bind(*args, **kwargs)
         bound.apply_defaults()
 
-        base_modules = _normalize_modules(_to_module_list(bound.arguments["modules"]))
+        requested = _to_module_list(bound.arguments["modules"])
+        # Core infra registered by default: the EventBus powers hot config
+        # refresh (ConfigChanged) and ecosystem eventing; modules like
+        # pico-resilience fail fast without it. Not a plugin, so it is NOT
+        # subject to PICO_BOOT_AUTO_PLUGINS.
+        base_modules = _normalize_modules(list(requested) + ["pico_ioc.event_bus"])
 
         auto_flag = os.getenv("PICO_BOOT_AUTO_PLUGINS", "true").lower()
         auto_plugins = auto_flag not in ("0", "false", "no", "off")

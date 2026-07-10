@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.0] - 2026-07-10
+
+### Added
+
+- `pico_ioc.event_bus` (EventBus) is registered by default on every `init()`: hot config refresh (`ConfigChanged`) and ecosystem eventing work zero-config, and modules that require the bus (pico-resilience >= 0.2.0) boot out of the box. Not affected by `PICO_BOOT_AUTO_PLUGINS` — it is core infra, not a plugin.
+
 ## [0.1.2] - 2026-06-10
 
 ### Added
