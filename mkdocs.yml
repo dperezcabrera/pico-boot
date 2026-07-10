@@ -138,6 +138,7 @@ plugins:
 nav:
   - Home: README.md
   - Getting Started: getting-started.md
+  - Flagship Use Case: flagship.md
   - Tutorials:
     - Full CRUD API: tutorial-full-crud.md
   - User Guide:
