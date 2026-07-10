@@ -211,7 +211,7 @@ LLM agent framework with dependency injection.
 - Virtual and proxy agent patterns
 
 **Usage:**
-```python
+```text
 from pico_agent import agent, tool, AgentType
 
 @agent(type=AgentType.OPENAI)

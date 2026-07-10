@@ -180,12 +180,12 @@ class DatabaseService:
 
 ```python
 # myapp/main.py
-from pico_ioc import configuration, YamlSource, EnvSource
+from pico_ioc import configuration, YamlTreeSource, EnvSource
 from pico_boot import init
 
 # Load configuration from YAML, then overlay environment variables
 config = configuration(
-    YamlSource("application.yaml"),
+    YamlTreeSource("application.yaml"),
     EnvSource()  # DATABASE_HOST, DATABASE_PORT, etc.
 )
 
@@ -488,14 +488,14 @@ class TodoService:
 ### main.py
 
 ```python
-from pico_ioc import configuration, YamlSource, EnvSource
+from pico_ioc import configuration, YamlTreeSource, EnvSource
 from pico_boot import init
 from services import TodoService
 
 def main():
     # Load configuration
     config = configuration(
-        YamlSource("application.yaml"),
+        YamlTreeSource("application.yaml"),
         EnvSource()
     )
 
@@ -525,7 +525,7 @@ def main():
 
     print(f"\nAfter completing todo 1:")
     for todo in todo_service.list_todos():
-        status = "✓" if todo.completed else " "
+        status = "" if todo.completed else " "
         print(f"  [{status}] {todo.title}")
 
     # Cleanup
@@ -551,7 +551,7 @@ Created todos:
   [3] Deploy to production
 
 After completing todo 1:
-  [✓] Learn pico-boot
+  [] Learn pico-boot
   [ ] Build an application
   [ ] Deploy to production
 ```
