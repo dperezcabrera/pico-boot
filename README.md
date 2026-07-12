@@ -335,23 +335,27 @@ mkdocs serve
 
 ---
 
-## AI Coding Skills
+## Built for AI-assisted development
 
-Install [Claude Code](https://code.claude.com) or [OpenAI Codex](https://openai.com/index/introducing-codex/) skills for AI-assisted development with pico-boot:
+pico-boot is where the whole ecosystem composes, and the composition itself is agent-friendly: plugins auto-register through entry points, applications declare what they use, and everything an agent adds lands inside one explicit architecture instead of a parallel style.
+
+What keeps agent-written code on-architecture:
+
+- **[pico-testing](https://github.com/dperezcabrera/pico-testing)** is the agent's feedback loop. Auto-discovery is disabled in tests by default (a suite never depends on what happens to be installed), and `make_container`/`make_client` boot exactly the modules a test names. `boot=True` exercises the real pico-boot path when discovery itself is under test.
+- **[pico-initializer](https://github.com/dperezcabrera/pico-initializer)** scaffolds pico-boot applications with the canonical layout and selected integrations.
+- **[pico-examples](https://github.com/dperezcabrera/pico-examples)** shows the packages composed in practice, from hermetic suites to Docker Compose and Kubernetes deployments with real smoke tests.
+- **[pico-learn](https://dperezcabrera.github.io/pico-learn/)** turns the patterns into executable lessons, validated in CI against the pinned published wheels.
+- **[pico-skills](https://github.com/dperezcabrera/pico-skills)** gives coding agents task-specific instructions (`/add-app`, `/add-component`, `/add-tests`).
+
+Every package ships `AGENTS.md` conventions, `llms.txt` machine-readable doc indexes, architecture decisions in `docs/`, and regression tests pinning documented behaviour. Releases are gated by a flagship application booting the entire ecosystem against real infrastructure before anything reaches PyPI.
+
+Install the agent skills for [Claude Code](https://code.claude.com) or [OpenAI Codex](https://openai.com/index/introducing-codex/):
 
 ```bash
 curl -sL https://raw.githubusercontent.com/dperezcabrera/pico-skills/main/install.sh | bash -s -- boot
 ```
 
-| Command | Description |
-|---------|-------------|
-| `/add-app` | Scaffold a new pico-boot application |
-| `/add-component` | Add components, factories, interceptors, settings |
-| `/add-tests` | Generate tests for pico components |
-
-All skills: `curl -sL https://raw.githubusercontent.com/dperezcabrera/pico-skills/main/install.sh | bash`
-
-See [pico-skills](https://github.com/dperezcabrera/pico-skills) for details.
+All skills: `curl -sL https://raw.githubusercontent.com/dperezcabrera/pico-skills/main/install.sh | bash` - see [pico-skills](https://github.com/dperezcabrera/pico-skills).
 
 ---
 
