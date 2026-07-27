@@ -1,0 +1,53 @@
+# pico-boot
+
+> Zero-configuration bootstrap for the Pico ecosystem
+
+Install: `pip install pico-boot`. Import surface: `from pico_boot import ...`.
+
+## Usage
+
+```python
+# app.py
+from pico_ioc import component, provides
+from pico_boot import init
+
+@component
+class Database:
+    def query(self) -> str:
+        return "data"
+
+@component
+class UserService:
+    def __init__(self, db: Database):
+        self.db = db
+
+# pico-boot's init() replaces pico-ioc's init()
+# It auto-discovers plugins and harvests custom scanners
+container = init(modules=[__name__])
+
+service = container.get(UserService)
+print(service.db.query())
+```
+
+## Public API
+
+- `init`
+- `PicoContainer`
+- `ContextConfig`
+- `ContainerObserver`
+
+## Docs
+
+- docs/api-reference.md
+- docs/architecture.md
+- docs/configuration.md
+- docs/creating-plugins.md
+- docs/ecosystem.md
+- docs/faq.md
+- docs/flagship.md
+- docs/getting-started.md
+- docs/how-to/ (3 pages)
+- docs/plugins.md
+- docs/skills.md
+- docs/troubleshooting.md
+- docs/tutorial-full-crud.md
