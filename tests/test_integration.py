@@ -14,8 +14,7 @@ from typing import Any, Callable, Optional, Tuple, Union
 from unittest.mock import patch
 
 import pytest
-from pico_ioc import PicoContainer, component, configured, provides
-from pico_ioc.factory import DeferredProvider, ProviderMetadata
+from pico_ioc import DeferredProvider, PicoContainer, ProviderMetadata, component, configured, provides
 
 import pico_boot
 
