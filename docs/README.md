@@ -116,7 +116,7 @@ my_plugin = "my_plugin"
 
 ## Version Compatibility
 
-- **Python:** 3.11+
+- **Python:** 3.11+ (tested on 3.11, 3.12, 3.13 and 3.14)
 - **pico-ioc:** >= 2.2.0
 
 ## License
