@@ -4,7 +4,7 @@ This guide walks you through creating your first application with Pico-Boot.
 
 ## Prerequisites
 
-- **Python 3.11** or newer
+- **Python 3.11** or newer (tested on 3.11, 3.12, 3.13 and 3.14)
 - Basic understanding of dependency injection concepts
 
 ## Installation
