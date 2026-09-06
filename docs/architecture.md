@@ -325,3 +325,7 @@ before forwarding all arguments to `pico_ioc.init()`.  The returned
 1. **Container features** - belong in pico-ioc
 2. **Framework features** - belong in specific integrations
 3. **CLI tools** - separate package
+
+## Stability and versioning
+
+This module follows the ecosystem policy in [ADR-014: API Stability and Deprecation](https://github.com/dperezcabrera/pico-ioc/blob/main/docs/adr/adr-0014-api-stability-and-deprecation.md). The public API is exactly what `__all__` exports, pinned by `tests/test_exports.py`. Before 1.0 a breaking change ships as a minor release; a deprecated name keeps working, with a `DeprecationWarning` naming its replacement, for at least one minor release and 90 days before removal.
