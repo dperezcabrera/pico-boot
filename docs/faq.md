@@ -157,7 +157,7 @@ Just declare it as a Python dependency:
 # my-plugin/pyproject.toml
 [project]
 dependencies = [
-    "pico-ioc>=2.2.0",
+    "pico-ioc>=2.4.0",
     "pico-sqlalchemy>=0.1.0",  # Depend on another plugin
 ]
 ```

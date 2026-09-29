@@ -91,7 +91,7 @@ def build_client(config: MyPluginConfig) -> SomeExternalClient:
 [project]
 name = "my-plugin"
 version = "1.0.0"
-dependencies = ["pico-ioc>=2.2.0"]
+dependencies = ["pico-ioc>=2.4.0"]
 
 [project.entry-points."pico_boot.modules"]
 my_plugin = "my_plugin"

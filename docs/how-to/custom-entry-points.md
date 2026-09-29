@@ -35,7 +35,7 @@ build-backend = "setuptools.build_meta"
 name = "my-pico-plugin"
 version = "1.0.0"
 requires-python = ">=3.11"
-dependencies = ["pico-ioc>=2.2.0"]
+dependencies = ["pico-ioc>=2.4.0"]
 
 [project.entry-points."pico_boot.modules"]
 my_plugin = "my_plugin"
