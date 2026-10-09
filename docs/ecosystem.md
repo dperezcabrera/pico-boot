@@ -136,7 +136,7 @@ SQLAlchemy integration with session management.
 **Configuration:**
 ```yaml
 database:
-  url: postgresql://user:pass@localhost/db
+  url: postgresql+asyncpg://user:pass@localhost/db
   pool_size: 5
   echo: false
 ```
@@ -248,7 +248,7 @@ app:
   debug: false
 
 database:
-  url: postgresql://localhost/myapp
+  url: postgresql+asyncpg://localhost/myapp
   pool_size: 10
 ```
 

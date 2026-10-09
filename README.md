@@ -182,7 +182,7 @@ myapp/
 
 ```yaml
 database:
-  url: postgresql://localhost/myapp
+  url: postgresql+asyncpg://localhost/myapp
 
 redis:
   url: redis://localhost:6379/0
